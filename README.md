@@ -1,6 +1,15 @@
+[English](./README.md) | [简体中文](./README.zh-CN.md)
+
 # SentinelPilot
 
 SentinelPilot is an automated security alert response and investigation Agent platform. It receives alerts from various security devices, normalizes them into a unified format, orchestrates investigation workflows using AI and security tools, manages human-in-the-loop approvals, and generates comprehensive Markdown incident reports.
+
+## Screenshots
+
+*(Replace placeholders with actual screenshots)*
+
+![Dashboard Screenshot](./docs/assets/screenshot-dashboard.png)
+![Approval Screenshot](./docs/assets/screenshot-approval.png)
 
 ## Features
 
