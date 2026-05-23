@@ -6,8 +6,6 @@ SentinelPilot is an automated security alert response and investigation Agent pl
 
 ## Screenshots
 
-*(Replace placeholders with actual screenshots)*
-
 ![Dashboard Screenshot](./docs/assets/screenshot-dashboard.png)
 ![Approval Screenshot](./docs/assets/screenshot-approval.png)
 
