@@ -1188,3 +1188,23 @@ M9 完成后以下 API 全部就绪，前端可以覆盖完整闭环：
 需要用户确认：无
 备注：
 - 真实钉钉卡片发送和按钮点击需等后续提供可公网访问的 `DINGTALK_CARD_CALLBACK_URL`、真实会话和机器人配置后再联调；当前默认测试不依赖真实外部服务。
+
+日期：2026-05-23
+当前阶段：GitHub 私有仓库发布阻塞
+本次完成：
+- 已在本地初始化 git 仓库，创建 `main` 基线提交，并在 `codex/complete-release` 分支提交完整发布改动。
+- 已尝试通过 GitHub API 创建 `Linuu/SentinelPilot` 私有仓库；当前令牌认证到的 GitHub 账号不是 `Linuu`，且没有权限创建 `Linuu` 组织仓库，因此未推送到错误 owner。
+本次修改文件：
+- docs/development-progress-plan.zh-CN.md
+已运行验证：
+- 提交前第三轮：cd backend; .\.venv\Scripts\python.exe -m pytest -q -> 69 passed
+- 提交前第三轮：cd backend; .\.venv\Scripts\ruff.exe check . -> All checks passed
+- 提交前第三轮：cd frontend; npm run lint -> 0 errors
+- 提交前第三轮：cd frontend; npm run build -> 编译、TypeScript 检查和静态页面生成通过
+- git diff --cached --check -> 通过
+当前阻碍：
+- 发布到 `Linuu/SentinelPilot` 需要能创建或访问该 owner 私有仓库的 GitHub Token；当前令牌无此权限。
+下一步：
+- 使用 `Linuu` 账号或具备 `Linuu/SentinelPilot` 管理权限的 GitHub Token 重新执行创建仓库、推送 `main` 与 `codex/complete-release`、创建 PR。
+需要用户确认：
+- 提供或切换到具备 `Linuu` owner 权限的 GitHub 认证方式。
