@@ -29,12 +29,12 @@ const caseNames: Record<string, { zh: string; en: string }> = {
 };
 
 const categoryNames: Record<string, { zh: string; en: string }> = {
-  credential_access: { zh: '凭据盗取与暴力破解', en: 'Credential Access' },
-  execution: { zh: '恶意命令与脚本执行', en: 'Command & Script Execution' },
-  web_intrusion: { zh: 'Web 漏洞入侵与网页后门', en: 'Web Intrusion' },
-  command_and_control: { zh: '命令与控制信道', en: 'Command & Control' },
-  lateral_movement: { zh: '内网横向渗透与传播', en: 'Lateral Movement' },
-  false_positive: { zh: '研发测试场景良性业务误报', en: 'Benign False Positive' }
+  credential_access: { zh: '凭据盗取与破解', en: 'Credential Access' },
+  execution: { zh: '恶意命令与脚本', en: 'Script Execution' },
+  web_intrusion: { zh: 'Web 漏洞与后门', en: 'Web Intrusion' },
+  command_and_control: { zh: '命令控制信道', en: 'Command & Control' },
+  lateral_movement: { zh: '内网横向移动', en: 'Lateral Movement' },
+  false_positive: { zh: '研发测试误报', en: 'False Positive' }
 };
 
 const severityMap: Record<string, string> = {
@@ -285,7 +285,7 @@ export default function EvalsDashboardPage() {
                 </div>
               </div>
 
-              <div className="text-xs text-[#6B6D70] font-sans mt-3 bg-[#FCFAF6] p-2.5 rounded border border-[#EAE9E4]">
+              <div className="text-[11px] leading-relaxed text-[#5C5E61] font-sans mt-3 bg-[#FCFAF6] p-2 rounded border border-[#EAE6DE]/70">
                 {language === 'zh'
                   ? '覆盖暴力破解、可疑PowerShell、Webshell、恶意域名、内网横向、信息外泄 6 大攻防场景研判校验。'
                   : 'Covers ssh brute force, obfuscated powershell, webshell upload, dga domain, lateral movement, and data exfiltration.'}
@@ -314,7 +314,7 @@ export default function EvalsDashboardPage() {
                 </div>
               </div>
 
-              <div className="text-xs text-[#6B6D70] font-sans mt-3 bg-[#FCFAF6] p-2.5 rounded border border-[#EAE9E4]">
+              <div className="text-[11px] leading-relaxed text-[#5C5E61] font-sans mt-3 bg-[#FCFAF6] p-2 rounded border border-[#EAE6DE]/70">
                 {language === 'zh'
                   ? 'AI 协处理器基于多维线索深度分析抓取入侵事实，自动对齐攻击战术并完成安全判定闭环。'
                   : 'AI coprocessor reconstructs attack paths, aligns tactics, and locks forensic evidence for safe investigation closing.'}
@@ -343,7 +343,7 @@ export default function EvalsDashboardPage() {
                   {
                     key: 'severity',
                     pass: c.severity_match,
-                    label: language === 'zh' ? '威胁级别判定' : 'Severity Qualitative Verdict',
+                    label: language === 'zh' ? '威胁级别判定' : 'Severity Verdict',
                     desc: language === 'zh'
                       ? `预期级别: ${severityMap[c.expected_severity] || c.expected_severity} • 实际判定: ${severityMap[c.actual_severity] || c.actual_severity}`
                       : `Expected: ${c.expected_severity.toUpperCase()} • Actual: ${c.actual_severity.toUpperCase()}`
@@ -351,7 +351,7 @@ export default function EvalsDashboardPage() {
                   {
                     key: 'category',
                     pass: c.category_match,
-                    label: language === 'zh' ? '威胁类型判定' : 'Threat Categorization',
+                    label: language === 'zh' ? '威胁类型判定' : 'Threat Category',
                     desc: language === 'zh'
                       ? `预期分类: ${categoryNames[c.expected_category]?.zh || c.expected_category} • 实际判定: ${categoryNames[c.actual_category]?.zh || c.actual_category}`
                       : `Expected: ${c.expected_category} • Actual: ${c.actual_category}`
@@ -359,7 +359,7 @@ export default function EvalsDashboardPage() {
                   {
                     key: 'mitre',
                     pass: c.mitre_match,
-                    label: language === 'zh' ? '攻防路径还原' : 'Attack Path Reconstruction',
+                    label: language === 'zh' ? '攻防路径还原' : 'MITRE Mapping',
                     desc: language === 'zh'
                       ? `预期战术: ${(c.expected_mitre || []).map(m => mitreMap[m] || m).join(', ') || '无'} • 实际判定: ${(c.actual_mitre || []).map(m => mitreMap[m] || m).join(', ') || '无'}`
                       : `Expected MITRE: ${(c.expected_mitre || []).join(',') || 'None'} • Actual: ${(c.actual_mitre || []).join(',') || 'None'}`
@@ -367,7 +367,7 @@ export default function EvalsDashboardPage() {
                   {
                     key: 'tools',
                     pass: c.tool_call_match,
-                    label: language === 'zh' ? '取证深度结论' : 'Deep Forensics Acquisition',
+                    label: language === 'zh' ? '取证深度结论' : 'Deep Forensics',
                     desc: language === 'zh'
                       ? '多维度日志深度取证与溯源分析，完整还原威胁发生现场证据'
                       : 'Multi-dimensional log forensics and trace analysis to secure threat evidence'
@@ -375,7 +375,7 @@ export default function EvalsDashboardPage() {
                   {
                     key: 'approval',
                     pass: c.approval_match,
-                    label: language === 'zh' ? '响应处置结果' : 'Response Containment Alignment',
+                    label: language === 'zh' ? '响应处置结果' : 'Response Align',
                     desc: c.requires_approval
                       ? (language === 'zh' ? '高风险威胁研判结果确凿，响应处置动作与威胁事实完全对齐并实现闭环' : 'High-risk threat verdict aligns with containment response actions')
                       : (language === 'zh' ? '经深度判定威胁不成立，事件安全闭环，无需执行额外阻断措施' : 'Low-risk anomaly requires no mitigation, verdict safely closed')
@@ -383,7 +383,7 @@ export default function EvalsDashboardPage() {
                   {
                     key: 'evidence',
                     pass: c.report_evidence_match,
-                    label: language === 'zh' ? '证据固化结果' : 'Evidence Chain Solidification',
+                    label: language === 'zh' ? '证据固化结果' : 'Evidence Secured',
                     desc: language === 'zh'
                       ? '事件分析判定报告中已完整固化终端及网络侧取证的全部证据链条'
                       : 'Incident report successfully generated with a solid, complete forensic evidence chain'
@@ -397,7 +397,6 @@ export default function EvalsDashboardPage() {
                 if (!isFalsePositive) {
                   badgeLabel = language === 'zh' ? '确认安全威胁' : 'Confirmed Threat';
                   if (language === 'zh') {
-                    // Confirmed security threat must be in red in Chinese mode
                     badgeColorClass = 'text-[#B83C25] bg-[#FCF1EE] border-[#FADCD5]';
                   } else {
                     if (c.actual_severity === 'critical') {
@@ -411,14 +410,10 @@ export default function EvalsDashboardPage() {
                 }
 
                 let hoverBorderClass = 'hover:border-[#8C8E91]';
-                if (isFalsePositive) {
-                  hoverBorderClass = 'hover:border-[#8C8E91]';
-                } else if (c.actual_severity === 'critical') {
-                  hoverBorderClass = 'hover:border-[#B83C25]';
-                } else if (c.actual_severity === 'high') {
-                  hoverBorderClass = 'hover:border-[#C2593F]';
-                } else if (c.actual_severity === 'medium') {
-                  hoverBorderClass = 'hover:border-[#D69E2E]';
+                if (!isFalsePositive) {
+                  if (c.actual_severity === 'critical') hoverBorderClass = 'hover:border-[#B83C25]';
+                  else if (c.actual_severity === 'high') hoverBorderClass = 'hover:border-[#C2593F]';
+                  else if (c.actual_severity === 'medium') hoverBorderClass = 'hover:border-[#D69E2E]';
                 }
 
                 return (
@@ -432,14 +427,14 @@ export default function EvalsDashboardPage() {
                         <span className="text-xs font-bold text-[#6B6D70] tracking-widest uppercase block">
                           {t('evals', 'caseLabel')}: <strong className="text-[#C2593F] font-bold">{displayCaseName}</strong>
                         </span>
-                        <h4 className="text-xs text-[#8C8E91] select-all">
+                        <h4 className="text-[11px] text-[#8C8E91] select-all">
                           {language === 'zh' ? '对应告警 ID' : 'Alert ID'}: {c.alert_id}
                         </h4>
                       </div>
 
                       <div>
                         <span className={`${
-                          (badgeLabel === '确认安全威胁' && language === 'zh') ? 'text-xs px-2.5 py-0.5' : 'text-[11px] px-2 py-0.5'
+                          (badgeLabel === '确认安全威胁' && language === 'zh') ? 'text-xs px-2.5 py-0.5' : 'text-[10px] px-2 py-0.5'
                         } font-bold font-mono rounded border uppercase select-none ${badgeColorClass}`}>
                           {badgeLabel}
                         </span>
@@ -454,11 +449,11 @@ export default function EvalsDashboardPage() {
 
                         {/* 1. Assessed Severity */}
                         <div className="space-y-1">
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C8E91] block">
-                            {language === 'zh' ? '判定严重等级' : 'Assessed Severity'}
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C8E91] block">
+                            {language === 'zh' ? '判定严重等级' : 'Severity'}
                           </span>
                           <div>
-                            <span className={`inline-flex items-center text-xs font-bold font-mono px-2 py-0.5 rounded border uppercase select-none ${
+                            <span className={`inline-flex items-center text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border uppercase select-none ${
                               c.actual_severity === 'critical' ? 'text-[#B83C25] bg-[#FCF1EE] border-[#FADCD5]' :
                               c.actual_severity === 'high' ? 'text-[#C2593F] bg-[#FFF2EE] border-[#FFE2D9]' :
                               c.actual_severity === 'medium' ? 'text-[#D69E2E] bg-[#FFFBEB] border-[#FEF3C7]' :
@@ -473,10 +468,10 @@ export default function EvalsDashboardPage() {
 
                         {/* 2. Threat Category */}
                         <div className="space-y-1">
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C8E91] block">
-                            {language === 'zh' ? '安全威胁分类' : 'Threat Category'}
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C8E91] block">
+                            {language === 'zh' ? '安全威胁分类' : 'Category'}
                           </span>
-                          <span className="text-sm font-semibold text-[#1E2022] font-mono block truncate" title={c.actual_category}>
+                          <span className="text-xs font-semibold text-[#1E2022] font-mono block truncate" title={c.actual_category}>
                             {language === 'zh'
                               ? (categoryNames[c.actual_category]?.zh || c.actual_category)
                               : (categoryNames[c.actual_category]?.en || c.actual_category)}
@@ -485,17 +480,17 @@ export default function EvalsDashboardPage() {
 
                         {/* 3. Verdict Analysis Outcome */}
                         <div className="space-y-1">
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C8E91] block">
-                            {language === 'zh' ? '分析研判结论' : 'Investigation Verdict'}
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C8E91] block">
+                            {language === 'zh' ? '分析研判结论' : 'Verdict'}
                           </span>
                           <div className="truncate">
                             {isFalsePositive ? (
                               <span className="text-[#2E7D32] font-semibold text-xs inline-flex items-center gap-1">
-                                ✔ {language === 'zh' ? '良性业务误报 (安全闭环)' : 'Benign False Positive'}
+                                ✔ {language === 'zh' ? '良性业务误报 (安全闭环)' : 'Benign Anomaly'}
                               </span>
                             ) : (
                               <span className="text-[#B83C25] font-semibold text-xs inline-flex items-center gap-1">
-                                ⚠️ {language === 'zh' ? '确证安全威胁 (已固化证据)' : 'Confirmed Threat (Evidence Secured)'}
+                                ⚠️ {language === 'zh' ? '确证安全威胁 (已固化证据)' : 'Confirmed Threat'}
                               </span>
                             )}
                           </div>
@@ -505,23 +500,23 @@ export default function EvalsDashboardPage() {
 
                       {/* AI Investigation Diagnostics Evidence Logs */}
                       <div className="p-4 bg-[#FAF9F5] border border-[#E1DEC9] rounded-md space-y-2 relative">
-                        <div className="absolute top-2 right-3 text-xs font-bold font-mono text-[#8C8E91] select-none uppercase tracking-widest">
+                        <div className="absolute top-2.5 right-3 text-[10px] font-bold font-mono text-[#8C8E91] select-none uppercase tracking-widest">
                           {language === 'zh' ? '研判结论与取证证据' : 'AI Forensics Evidence'}
                         </div>
-                        <div className="text-sm font-bold text-[#4A4B4D] border-b border-[#EAE9E4] pb-1.5 mb-2 flex items-center gap-1.5 uppercase font-mono">
+                        <div className="text-xs font-bold text-[#4A4B4D] border-b border-[#EAE9E4] pb-1.5 mb-2 flex items-center gap-1.5 uppercase font-mono">
                           <span>📋 {language === 'zh' ? '事件研判分析报告与追踪轨迹' : 'Incident Investigation Report & Forensics Trace'}</span>
                         </div>
                         <p className="font-sans leading-relaxed text-sm text-[#2A2B2D] whitespace-pre-line text-left">
-                          {c.diagnostics}
+                          {language === 'zh' ? c.diagnostics : (c.diagnostics_en || c.diagnostics)}
                         </p>
                       </div>
 
                       {/* Micro Compliance Footer (Grader Audits) */}
-                      <div className="pt-3 border-t border-[#EAE9E4]/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-[#6B6D70] font-mono">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-bold text-[13px] uppercase text-[#8C8E91] tracking-wider">
+                      <div className="pt-3 border-t border-[#EAE9E4]/60 flex flex-col gap-3 text-[11px] text-[#6B6D70] font-mono">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="font-bold text-[10px] uppercase text-[#8C8E91] tracking-wider">
                             {language === 'zh' ? '威胁多维分析结果校验' : 'Multi-dimensional Threat Analysis Verification'}:
-                          </span>
+                          </div>
                           <div className="flex flex-wrap items-center gap-3">
                             {complianceItems.map((item) => (
                               <span
@@ -529,8 +524,8 @@ export default function EvalsDashboardPage() {
                                 className="inline-flex items-center gap-1 select-none cursor-help"
                                 title={`${item.label}: ${item.desc}`}
                               >
-                                <span className={`w-2 h-2 rounded-full ${item.pass ? 'bg-[#2E7D32]' : 'bg-[#B83C25]'}`} />
-                                <span className={`text-[13px] ${item.pass ? 'text-[#4A4B4D]' : 'text-[#B83C25] font-semibold'}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${item.pass ? 'bg-[#2E7D32]' : 'bg-[#B83C25]'}`} />
+                                <span className={`text-[11px] ${item.pass ? 'text-[#4A4B4D]' : 'text-[#B83C25] font-semibold'}`}>
                                   {item.label}
                                 </span>
                               </span>
@@ -538,13 +533,13 @@ export default function EvalsDashboardPage() {
                           </div>
                         </div>
 
-                        <div className="text-[13px] font-bold text-[#8C8E91] self-end">
-                          {language === 'zh' ? '威胁研判结论:' : 'Verdict Analysis Quality:'}{' '}
-                          <span className={c.passed ? 'text-[#2E7D32]' : 'text-[#B83C25]'}>
+                        <div className="text-[13px] font-bold text-[#8C8E91]">
+                          <div className="mb-0.5">{language === 'zh' ? '威胁研判结论:' : 'Verdict Analysis Quality:'}</div>
+                          <div className={c.passed ? 'text-[#2E7D32]' : 'text-[#B83C25]'}>
                             {c.passed
                               ? (language === 'zh' ? '研判结论确凿且证据完整' : 'Accurate Verdict & Secured Evidence')
                               : (language === 'zh' ? '研判结论存疑待专家复核' : 'Verdict Suspicious - Analyst Review Required')}
-                          </span>
+                          </div>
                         </div>
                       </div>
 

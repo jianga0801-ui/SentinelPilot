@@ -27,7 +27,8 @@ export const evalBaselineSummary: EvalRunSummary = {
       approval_match: true,
       report_evidence_match: true,
       passed: true,
-      diagnostics: "大模型协处理器在接收告警后瞬间启动深度研判。通过调取源IP威胁情报及服务器系统取证日志，发现该IP在15分钟内发起超过500次高频密码猜测且全部失败，随后伴随一次成功的凭据登录行为。研判结论确证为真实暴力破解入侵，并将威胁级别由中危动态提升为“高危”。已锁定了攻击者的攻击路径。威胁判定分析精准，并完成全证据链固化。"
+      diagnostics: "大模型协处理器在接收告警后瞬间启动深度研判。通过调取源IP威胁情报及服务器系统取证日志，发现该IP在15分钟内发起超过500次高频密码猜测且全部失败，随后伴随一次成功的凭据登录行为。研判结论确证为真实暴力破解入侵，并将威胁级别由中危动态提升为“高危”。已锁定了攻击者的攻击路径。威胁判定分析精准，并完成全证据链固化。",
+      diagnostics_en: "The AI coprocessor immediately initiated a deep investigation upon receiving the alert. By retrieving source IP threat intelligence and server forensic logs, it found that this IP attempted over 500 password guesses within 15 minutes, all of which failed, followed by one successful credential login. The investigation concluded this as a real brute force intrusion, and the threat severity was dynamically promoted from medium to 'high'. The attacker's intrusion path has been locked. The threat verdict is highly accurate and the entire forensic evidence chain has been secured."
     },
     {
       case_id: "eval_powershell_001",
@@ -48,7 +49,8 @@ export const evalBaselineSummary: EvalRunSummary = {
       approval_match: true,
       report_evidence_match: true,
       passed: true,
-      diagnostics: "大模型协处理器通过终端日志深度分析与取证溯源，抓取到包含 Base64 高度混淆的恶意 PowerShell 命令行执行，深度还原其隐藏的远控木马下载载荷。判定结果为高危恶意代码执行事件，映射至 MITRE 战术框架 T1059.001（PowerShell脚本执行）。研判分析深入，获取到木马回连的控制端IP及完整入侵链条，取证证据链条极其完整。"
+      diagnostics: "大模型协处理器通过终端日志深度分析与取证溯源，抓取到包含 Base64 高度混淆的恶意 PowerShell 命令行执行，深度还原其隐藏的远控木马下载载荷。判定结果为高危恶意代码执行事件，映射至 MITRE 战术框架 T1059.001（PowerShell脚本执行）。研判分析深入，获取到木马回连的控制端IP及完整入侵链条，取证证据链条极其完整。",
+      diagnostics_en: "Through endpoint log deep analysis and forensic trace investigation, the AI coprocessor captured a highly obfuscated PowerShell command line execution containing Base64 encoding and reconstructed its hidden remote Trojan download payload. The verdict is a high-risk malicious code execution event, mapped to the MITRE ATT&CK framework T1059.001 (PowerShell script execution). The threat analysis was conducted in-depth, capturing the Trojan's command and control IP and the complete intrusion chain. The secured forensic evidence chain is extremely complete."
     },
     {
       case_id: "eval_webshell_001",
@@ -69,7 +71,8 @@ export const evalBaselineSummary: EvalRunSummary = {
       approval_match: true,
       report_evidence_match: true,
       passed: true,
-      diagnostics: "通过对网络流量日志与Web服务访问日志进行多源关联分析，捕获到攻击者上载可疑 jsp 网页木马脚本并尝试执行系统控制命令的精准证据。判决确认该事件为真实“Webshell网页后门植入”。成功提取解析出攻击者所控指令，事件全链条研判溯源结束，已进行了完整取证固化，研判结论准确率达100%。"
+      diagnostics: "通过对网络流量日志与Web服务访问日志进行多源关联分析，捕获到攻击者上载可疑 jsp 网页木马脚本并尝试执行系统控制命令的精准证据。判决确认该事件为真实“Webshell网页后门植入”。成功提取解析出攻击者所控指令，事件全链条研判溯源结束，已进行了完整取证固化，研判结论准确率达100%。",
+      diagnostics_en: "Through multi-source correlation analysis of network traffic and Web service access logs, precise evidence was captured showing the attacker uploaded a suspicious JSP Web shell backdoor script and attempted to execute system control commands. The verdict confirms this incident as a real 'Webshell webpage backdoor upload'. The attacker's controlled commands were successfully extracted and parsed, and the full investigation and tracing process concluded with complete evidence secured. The verdict accuracy is 100%."
     },
     {
       case_id: "eval_malicious_domain_001",
@@ -90,7 +93,8 @@ export const evalBaselineSummary: EvalRunSummary = {
       approval_match: true,
       report_evidence_match: true,
       passed: true,
-      diagnostics: "通过DNS解析与网络出站心跳流量深度分析，确证终端存在向已知僵尸网络（DGA动态域名）发起高频微小包信标行为。判决该终端已被网络间谍组织控制（C2信道通信），成功关联并捕获应用层恶意通信控制流量，分析结论确凿且证据链完整。"
+      diagnostics: "通过DNS解析与网络出站心跳流量深度分析，确证终端存在向已知僵尸网络（DGA动态域名）发起高频微小包信标行为。判决该终端已被网络间谍组织控制（C2信道通信），成功关联并捕获应用层恶意通信控制流量，分析结论确凿且证据链完整。",
+      diagnostics_en: "Through DNS resolution and network outbound beacon traffic deep analysis, it was confirmed that the endpoint exhibits high-frequency small-packet beaconing behavior to a known botnet (DGA dynamic domain). The verdict confirms that the endpoint has been compromised by a cyber espionage group (C2 channel communication), successfully correlating and capturing application-layer malicious command and control traffic. The analysis conclusion is solid and the evidence chain is complete."
     },
     {
       case_id: "eval_lateral_movement_001",
@@ -111,7 +115,8 @@ export const evalBaselineSummary: EvalRunSummary = {
       approval_match: true,
       report_evidence_match: true,
       passed: true,
-      diagnostics: "系统捕捉到单台主机在内网使用批量管理员凭据及 SMB 服务向多达 12 台相邻网段机器发起高频横向嗅探与连接请求。研判确认该失陷终端处于活跃的“内网横向渗透阶段”，极具扩散危害。已锁定受影响的资产范围及受侵入凭据。威胁判定结论极为清晰，已固化其恶意探测路径。"
+      diagnostics: "系统捕捉到单台主机在内网使用批量管理员凭据及 SMB 服务向多达 12 台相邻网段机器发起高频横向嗅探与连接请求。研判确认该失陷终端处于活跃的“内网横向渗透阶段”，极具扩散危害。已锁定受影响的资产范围及受侵入凭据。威胁判定结论极为清晰，已固化其恶意探测路径。",
+      diagnostics_en: "The system detected a single host using bulk administrator credentials and the SMB service to launch high-frequency lateral scanning and connection requests to 12 adjacent servers in the internal network. The verdict confirms that the compromised endpoint is in an active 'internal network lateral movement' phase with high diffusion hazard. The affected asset scope and compromised credentials have been locked. The threat verdict is extremely clear and the malicious scanning path has been fully secured."
     },
     {
       case_id: "eval_false_positive_001",
@@ -132,7 +137,8 @@ export const evalBaselineSummary: EvalRunSummary = {
       approval_match: true,
       report_evidence_match: true,
       passed: true,
-      diagnostics: "经过对注入告警的细粒度行为基线比对与取证分析，发现该告警系研发测试部门在进行良性网络接口测试。所有网络活动完全在合规研发网段内开展，未发现任何恶意工具调用或跨区渗透痕迹。事件研判确证为“良性业务误报”，已成功排除安全风险并达成业务闭环。"
+      diagnostics: "经过对注入告警的细粒度行为基线比对与取证分析，发现该告警系研发测试部门在进行良性网络接口测试。所有网络活动完全在合规研发网段内开展，未发现任何恶意工具调用或跨区渗透痕迹。事件研判确证为“良性业务误报”，已成功排除安全风险并达成业务闭环。",
+      diagnostics_en: "After fine-grained behavioral baseline comparison and forensic analysis of the injected alert, it was found that the alert was triggered by the R&D department conducting benign network interface tests. All network activities were conducted completely within the compliant R&D network segment, and no malicious tool usage or cross-zone penetration traces were found. The investigation confirmed the incident as a 'benign false positive', successfully excluding security risks and achieving business closing."
     }
   ]
 };

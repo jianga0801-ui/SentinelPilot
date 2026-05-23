@@ -42,21 +42,49 @@ export const translations = {
       zh: '研判效能与态势评估',
       en: 'Threat & Policy Analytics'
     },
-    systemControl: {
-      zh: '系统控制栏',
-      en: 'SYSTEM CONTROL'
+    llmConfig: {
+      zh: '大模型配置',
+      en: 'LLM Configuration'
+    },
+    systemStatus: {
+      zh: '系统状态栏',
+      en: 'SYSTEM STATUS'
     },
     coprocessor: {
       zh: 'AI 研判大模型',
       en: 'AI Coprocessor'
     },
+    coprocessorTip: {
+      zh: '后台安全大模型研判引擎常驻运行中，负责安全日志特征分析与威胁推演。',
+      en: 'Backend AI security model engine is continuously running, responsible for threat analysis and deduction.'
+    },
     decider: {
       zh: '自动决策流',
       en: 'Auto Decider'
     },
+    deciderTip: {
+      zh: '自动化响应策略执行引擎已就绪，等待下发拦截动作或请求审批。',
+      en: 'Automated response policy execution engine is ready, waiting to dispatch actions or request approval.'
+    },
     backendStatus: {
-      zh: '后端服务状态',
-      en: 'BACKEND STATUS'
+      zh: '后端服务',
+      en: 'Backend API'
+    },
+    backendStatusTip: {
+      zh: '平台后端核心服务连接状态',
+      en: 'Core backend service connection status'
+    },
+    imCollaboration: {
+      zh: '即时通讯协同',
+      en: 'IM Collaboration'
+    },
+    providers: {
+      dingtalk: { zh: '钉钉', en: 'DingTalk' },
+      feishu: { zh: '飞书', en: 'Feishu' },
+      wecom: { zh: '企业微信', en: 'WeCom' },
+      mock: { zh: 'Mock 模型', en: 'Mock Model' },
+      openai_compatible: { zh: 'OpenAI 兼容', en: 'OpenAI Compatible' },
+      unknown: { zh: '未知渠道', en: 'Unknown Channel' }
     },
     running: {
       zh: '运行中',
@@ -67,16 +95,40 @@ export const translations = {
       en: 'Ready'
     },
     serviceOnline: {
-      zh: '服务运行中',
-      en: 'Service Online'
+      zh: '已连接',
+      en: 'Online'
     },
     serviceConnecting: {
-      zh: '正在连接中...',
+      zh: '连接中...',
       en: 'Connecting...'
     },
     serviceOffline: {
-      zh: '服务已断开',
-      en: 'Service Offline'
+      zh: '已断开',
+      en: 'Offline'
+    },
+    dtFull: {
+      zh: '全功能',
+      en: 'Interactive'
+    },
+    dtFullTip: {
+      zh: '即时通讯互动卡片审批已启用，可在对应软件内直接进行告警阻断审批。',
+      en: 'Interactive card approval is enabled, allowing direct mitigation approvals in the configured IM app.'
+    },
+    dtNotify: {
+      zh: '仅通知',
+      en: 'Notify Only'
+    },
+    dtNotifyTip: {
+      zh: '通知推送已启用，但不包含卡片审批回调。',
+      en: 'Notifications enabled without interactive callback support.'
+    },
+    dtDisabled: {
+      zh: '未启用',
+      en: 'Disabled'
+    },
+    dtDisabledTip: {
+      zh: '即时通讯协同未配置或未开启。',
+      en: 'IM collaboration is not configured or disabled.'
     }
   },
 
@@ -122,8 +174,8 @@ export const translations = {
       en: 'Severity'
     },
     colCategory: {
-      zh: '资产分类',
-      en: 'Category'
+      zh: '威胁类型',
+      en: 'Threat Tactic'
     },
     colTime: {
       zh: '注入时间',

@@ -3,6 +3,7 @@ from sentinel_pilot.agent.tools import Evidence
 from sentinel_pilot.core.errors import SentinelPilotError
 from sentinel_pilot.core.models import ApprovalAction, Investigation, RiskLevel, Severity
 from sentinel_pilot.integrations.im.notifier import IMNotifier
+from sentinel_pilot.llm.base import LLMAnalysis, LLMClient, LLMConstraints
 from sentinel_pilot.storage.repositories import (
     ApprovalRepository,
     InvestigationRepository,
@@ -18,12 +19,16 @@ class InvestigationOrchestrator:
         approvals: ApprovalRepository | None = None,
         registry: ToolRegistry | None = None,
         im_notifier: IMNotifier | None = None,
+        llm_client: LLMClient | None = None,
+        llm_constraints: LLMConstraints | None = None,
     ) -> None:
         self.investigations = investigations
         self.timeline = timeline
         self.approvals = approvals or ApprovalRepository(investigations.connection)
         self.registry = registry or ToolRegistry.default(timeline=timeline)
         self.im_notifier = im_notifier
+        self.llm_client = llm_client
+        self.llm_constraints = llm_constraints or LLMConstraints()
 
     def run(self, investigation_id: str) -> Investigation:
         investigation = self.investigations.get(investigation_id)
@@ -79,6 +84,27 @@ class InvestigationOrchestrator:
             threat_intel,
         )
         approval = self._approval_request(alert.category, alert.entities)
+        llm_analysis = self._llm_analysis(
+            investigation_id=investigation_id,
+            alert=alert,
+            logs=logs,
+            threat_intel=threat_intel,
+            evidence_text=evidence_text,
+            fallback_summary=summary,
+            fallback_severity=severity,
+            fallback_category=category,
+            fallback_mitre=[technique.technique_id for technique in techniques],
+        )
+        if llm_analysis is not None:
+            severity = llm_analysis.severity
+            category = llm_analysis.category
+            summary = llm_analysis.summary
+            if llm_analysis.mitre_techniques:
+                techniques = [
+                    type("TechniqueRef", (), {"technique_id": technique_id})()
+                    for technique_id in llm_analysis.mitre_techniques
+                ]
+            approval = self._llm_approval_request(llm_analysis) or approval
         status = "completed"
         if approval is not None:
             action_type, target, risk_level, reason = approval
@@ -100,7 +126,10 @@ class InvestigationOrchestrator:
                 )
                 if self.im_notifier is not None:
                     self.im_notifier.send_approval_required(created_approval)
-                status = "waiting_approval"
+                if self.llm_constraints.action_mode == "auto_approve_simulated":
+                    self._auto_approve_simulated(created_approval.id)
+                else:
+                    status = "waiting_approval"
         return self.investigations.update_analysis(
             investigation_id=investigation_id,
             status=status,
@@ -108,6 +137,90 @@ class InvestigationOrchestrator:
             severity=severity,
             category=category,
             mitre_techniques=[technique.technique_id for technique in techniques],
+        )
+
+    def _llm_analysis(
+        self,
+        investigation_id: str,
+        alert,
+        logs: list,
+        threat_intel: object | None,
+        evidence_text: str,
+        fallback_summary: str,
+        fallback_severity: Severity,
+        fallback_category: str,
+        fallback_mitre: list[str],
+    ) -> LLMAnalysis | None:
+        if self.llm_client is None:
+            return None
+        context = {
+            "alert": alert.model_dump(mode="json"),
+            "logs": [
+                log.model_dump(mode="json") if hasattr(log, "model_dump") else str(log)
+                for log in logs
+            ],
+            "threat_intel": (
+                threat_intel.model_dump(mode="json")
+                if hasattr(threat_intel, "model_dump")
+                else threat_intel
+            ),
+            "evidence_text": evidence_text,
+            "fallback_analysis": {
+                "summary": fallback_summary,
+                "severity": fallback_severity,
+                "category": fallback_category,
+                "mitre_techniques": fallback_mitre,
+            },
+            "constraints": self.llm_constraints.as_status(),
+        }
+        analysis = self.llm_constraints.apply(self.llm_client.analyze(context))
+        self.timeline.add(
+            investigation_id=investigation_id,
+            type="agent_message",
+            title="LLM analysis",
+            content=analysis.summary,
+            input={"provider_context": "normalized_evidence"},
+            output={
+                "severity": analysis.severity,
+                "category": analysis.category,
+                "mitre_techniques": analysis.mitre_techniques,
+                "confidence": analysis.confidence,
+                "recommended_actions": [
+                    action.model_dump(mode="json") for action in analysis.recommended_actions
+                ],
+            },
+        )
+        return analysis
+
+    def _llm_approval_request(
+        self,
+        analysis: LLMAnalysis,
+    ) -> tuple[ApprovalAction, str, RiskLevel, str] | None:
+        if self.llm_constraints.action_mode == "recommend_only":
+            return None
+        if not analysis.recommended_actions:
+            return None
+        action = analysis.recommended_actions[0]
+        return (
+            action.action_type,  # type: ignore[return-value]
+            action.target,
+            action.risk_level,
+            action.reason,
+        )
+
+    def _auto_approve_simulated(self, approval_id: str) -> None:
+        approval = self.approvals.update_decision(
+            approval_id,
+            "approved",
+            "Auto-approved by LLM policy in simulated response mode.",
+        )
+        self.timeline.add(
+            investigation_id=approval.investigation_id,
+            type="approval_decision",
+            title="Simulated auto-approval recorded",
+            content=f"Approval {approval.id} was auto-approved by LLM policy.",
+            input={"approval_id": approval.id, "decision": "approved"},
+            output={"status": approval.status, "simulated": True},
         )
 
     def _classify(

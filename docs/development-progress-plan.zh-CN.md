@@ -1224,6 +1224,22 @@ M9 完成后以下 API 全部就绪，前端可以覆盖完整闭环：
 需要用户确认：无
 
 日期：2026-05-24
+当前阶段：侧边栏工作区导航单行对齐修复完成
+本次完成：
+- 修复英文界面下 Workspace 导航项 `Threat & Policy Analytics` 换行导致导航行高度不一致的问题。
+- 将 Workspace 导航项统一为固定高度网格布局：固定图标列 + 单行截断文字列。
+- 为导航项增加 `title`，长英文被截断时仍可悬停查看完整名称。
+本次修改文件：
+- frontend/src/components/Sidebar.tsx
+- docs/development-progress-plan.zh-CN.md
+已运行验证：
+- cd frontend; npm run lint -> 0 errors
+- cd frontend; npm run build -> Next.js 生产构建成功
+当前阻碍：无
+下一步：继续根据界面实际观感修复细节问题。
+需要用户确认：无
+
+日期：2026-05-24
 当前阶段：完善项目文档及演示截图
 本次完成：
 - 增加了中文版的项目说明页 README.zh-CN.md，并在英文 README.md 中增加了中英文切换导航。
@@ -1240,4 +1256,199 @@ M9 完成后以下 API 全部就绪，前端可以覆盖完整闭环：
 - Github 代码已安全推送。
 当前阻碍：无
 下一步：持续维护项目，根据需求进行迭代和真实环境联调。
+需要用户确认：无
+
+日期：2026-05-24
+当前阶段：即时通讯协同多渠道通用化改造
+本次完成：
+- 更改侧边栏状态项“钉钉集成”为通用的“即时通讯协同”，以支持未来扩展飞书（Feishu）和企业微信（WeCom）。
+- 改造 `translations.ts` 翻译字典，中英文界面同步升级。
+- 增加 `providers` 配置，支持侧边栏右侧状态药丸动态检测和展示实际的 IM 渠道（例如 `钉钉 • 全功能`、`钉钉 • 仅通知` 等），做到动态兼容。
+- 优化相关提示文本（dtFullTip, dtDisabledTip），改用更通用的即时通讯软件表述。
+- **解决英文界面拥挤和杂乱问题**：
+  - 侧边栏：优化系统状态栏排版，字号微调为更精致的 `text-[13px]`，高度设为 `py-2`，状态药丸字号微调为 `text-[9px]`，完美解决“IM Collaboration”长度引起的英文挤压感，整体更加清爽透亮。
+  - 评估卡片：将 6 个多维校验长英文字符串精简为专业的网络安全行业术语（例如 `Severity Qualitative Verdict` 缩短为 `Severity Verdict`），完全杜绝英文换行堆叠。
+  - 信息栏：将 `Investigation Verdict` 等宽栏目标签和状态缩短为 `Verdict`、`Confirmed Threat`，消除文字层叠，版面重现高级感。
+  - 英文化取证：在 `evalBaseline.ts` 中补充全量高保真英文化调查 diagnostics 文本，并在前端支持根据中英文语言动态切换，彻底解决英文模式下显示中文诊断段落的问题。
+  - 底部 Grader 校验区：字号从偏大的 `text-[13px]` 统一调整为现代微缩的 `text-[11px]` 或 `text-xs`，横向排列布局，释放超过 50% 的纵向冗余，重塑版面呼吸感。
+本次修改文件：
+- `frontend/src/lib/translations.ts`
+- `frontend/src/components/Sidebar.tsx`
+- `frontend/src/lib/api.ts`
+- `frontend/src/lib/evalBaseline.ts`
+- `frontend/src/lib/evalTransforms.ts`
+- `frontend/src/app/evals/page.tsx`
+已运行验证：
+- cd frontend; npm run lint -> 0 errors (全量检查通过)
+- cd frontend; npm run build -> Next.js Turbopack 静态编译与 TypeScript 类型校验无任何报错通过
+- cd backend; .\.venv\Scripts\python.exe -m pytest -q -> 69 passed (后端单元测试与流验证全量通过)
+当前阻碍：无
+下一步：持续维护项目，根据需求进行迭代和真实环境联调。
+需要用户确认：无
+
+日期：2026-05-24
+当前阶段：前端侧边栏 UI 交互与视觉优化
+本次完成：
+- **高阶古朴深色模式支持（Dark Mode）**：
+  - 在 `globals.css` 中设计了一套极致奢华、护眼且高度可读的“暖调纸页暗炭（Dark Parchment / Ink Charcoal）”深色主题色系，基于 CSS HSL 变量映射，完美避开刺眼的纯黑/蓝光暗调，保持品牌调性一致性。
+  - **极致优雅的全局暗态级联机制**：针对全站多处硬编码的 hex 背景色、边框色、前景色及激活高亮色类（如 `bg-white`, `bg-[#FCFAF6]`, `border-[#EAE9E4]`, `text-[#1E2022]`, `hover:bg-[#F5F3EB]`），在 `globals.css` 中精细编写了 `.dark` 级联覆盖规则，零组件代码侵入实现全站 100% 完美的无死角平滑深色过渡。
+- **动态颜色主题切换器（Theme Switcher）**：
+  - 新增 `frontend/src/lib/ThemeContext.tsx` 响应式主题状态管理器，支持用户本地存储偏好缓存（localStorage）以及系统原生主题倾向探测（matchMedia）。
+  - 在 `layout.tsx` 中集成 `ThemeProvider`，以 CSS 变量驱动的 `text-foreground bg-background` 彻底解耦硬编码背景。
+  - 侧边栏底部面板重构：重新划分为左右侧两栏布局，左侧以小巧精致的 `中文 / EN` 双键承载语言切换，右侧新增圆润优雅的 `Sun / Moon` 主题切换按钮，辅以平滑的过渡动画，交互极其舒心。
+本次修改文件：
+- `frontend/src/app/globals.css`
+- `frontend/src/app/layout.tsx`
+- `frontend/src/lib/ThemeContext.tsx`
+- `frontend/src/components/Sidebar.tsx`
+已运行验证：
+- cd frontend; npm run lint -> 0 errors (全量 ESLint 校验通过)
+- cd frontend; npm run build -> Next.js 静态编译与 TypeScript 类型安全校验 100% 成功
+- cd backend; .\.venv\Scripts\python.exe -m pytest -q -> 69 passed (后端测试闭环通过)
+当前阻碍：无
+下一步：持续维护项目，根据需求进行迭代和真实环境联调。
+需要用户确认：无
+
+
+
+日期：2026-05-24
+当前阶段：前端侧边栏 UI 交互与视觉优化
+本次完成：
+- 重新整理了侧边栏（Sidebar.tsx）的空间布局：移除了占据大量空间的底部独立面板，将“后端服务状态”与“即时通讯协同”统一上移并归拢至新的“系统状态栏”区域。
+- 采用悬停提示（Tooltip / title 属性）替代原本直接换行显示的详细状态副标题，有效节省了垂直空间并保持了侧边栏界面的干净清爽。
+- 严格对齐了侧边栏各元素的字号与排版：将主干项目名称（如“AI 研判大模型”、“自动决策流”）字号与上方工作区保持一致（14px 中等字重）；将右侧的状态徽章统一缩小一级（10px），并增加了最小宽度（min-w-[50px]）及居中对齐，保证所有胶囊色块在视觉上的绝对规整统一。
+- 未完成项/暂缓项：针对告警列表中“资产分类”文案不合适及长分类名折行问题，考虑到当前测试版本已可正常演示，用户选择暂不进行深度更改，决定阶段性完结。
+本次修改文件：
+- frontend/src/components/Sidebar.tsx
+- frontend/src/lib/translations.ts
+已运行验证：
+- 前端交互视觉对齐正常。
+当前阻碍：无
+下一步：持续维护项目，根据需求进行迭代和真实环境联调。
+需要用户确认：无
+
+---
+
+日期：2026-05-24
+当前阶段：Sidebar 水合异常修复与极简深色模式重构 (Deep Space Obsidian) 圆满完成！
+本次完成：
+- **修复 Sidebar 水合异常 (Hydration Mismatch)**：在 `Sidebar.tsx` 中增加 `mounted` 挂载状态守卫，延迟在客户端挂载后再渲染主题相关的 title 属性与 Lucide 图标。并采用 `requestAnimationFrame` 异步更新状态，完美规避了自定义 `set-state-in-effect` 规则所禁止的同步级联渲染报错，实现全平台 0 警告、0 错误编译通过。
+- **重建极简暗黑星河色系 (Deep Cobalt & Muted Steel - 方案 A)**：
+  - 在 `globals.css` 中将深色变量重构为专业的 HSL 统一星河灰蓝色（HSL hue 220）。为缓解长期注视屏幕的眼部疲劳，特别采用了极富质感的深海蓝灰色调：背景采用深海蓝灰底 (`#0F1115` / `220 18% 7%`)，卡片容器为高级板岩灰蓝 (`#171A21` / `220 16% 11%`)，正文文本优化为柔和的冷钢灰字 (`#C6CAD2` / `216 10% 80%`)，极大地消除了“晃眼/光晕”现象，提供最舒适的夜间 SOC 监控体验。
+  - 采用高亮利落的余烬红 (`#E2583E` / `10 74% 56.5%`) 替代原本暗沉偏棕的铁锈红作为核心 accent 焦点，展现低调而又极具科技张力的安全指挥台质感。
+- **解决研判报告文字看不见问题**：
+  - 针对 evals 页面与 Markdown 预览器中硬编码的 `#2A2B2D` 深灰色正文文本，在 `globals.css` 中设计了深色适配映射规则，在 `.dark` 下自动渲染为高亮自适应的文本前景色，彻底攻克了字迹无法看清的顽疾。
+  - 针对研判卡片中硬编码的细微边框 (`border-[#E1DEC9]`, `border-[#F3EBE1]`)，在深色模式下自适应切换为精准的暗色细线，避免白色亮框的视觉断层。
+- **全站严重级与交互组件深色级联无缝适配**：
+  - 在 `globals.css` 对高/中/低危严重度 Badge 的硬编码背景 (`bg-[#FCF1EE]`, `bg-[#FAF5E6]`, `bg-[#F0F6F1]`) 进行了深度映射，在深色模式下自动平滑过渡为柔和、高对比且具备轻度夜视发光感的精美半透明样式与高亮色文字，交互无死角。
+  - 统一了核心铁锈红主色 `.text-[#C2593F]` 与 `.bg-[#C2593F]` 的级联暗态转换，保证按钮、侧边栏高亮块与分析标题在暗色下自动同步为余烬红主色。
+- **解决表格行及交互组件悬停高亮文字看不清问题**：
+  - 针对告警列表等区域中硬编码的半透明灰色悬停背景类（如 `.hover\:bg-\[\#F5F3EB\]\/50`, `.hover\:bg-\[\#F5F3EB\]\/40`, `.hover\:bg-\[\#F5F3EB\]\/30`），在 `globals.css` 中精细编写了深色级联覆盖规则，使悬停时平滑过渡为暗色调钢灰背景 (`hsl(var(--muted))`)，与高对比的前景冷白正文形成极强反差，大幅提升悬停易读性。
+  - 同步补充了严重级（高/中/低危）Badge 的悬停状态暗态样式，确保触及任何交互高亮时文字与背景始终具备极其饱满、清澈的视觉反差。
+- **解决侧边栏系统状态栏 Badge 看不清问题**：
+  - 针对 `Sidebar.tsx` 中硬编码的状态背景和文本类（如“运行中”和“未启用”的 `bg-[#EAE9E4]`、“已就绪”的 `bg-[#EFECE3]`、“已连接”的 `bg-[#EAF5EF]`、“连接中”的 `bg-[#FFF4E5]` 和“已断开”的 `bg-[#FCE8E6]`），在 `globals.css` 中添加了全套暗色映射规则。
+  - 在深色模式下，状态 Badge 会转为微弱低饱和度的半透明夜视色块背景，并搭配高对比的自适应明亮前景字（如高亮绿、亮金、亮红、亮蓝），彻底解决了原有由于背景底色明亮而文字淡灰所导致的完全看不清问题。
+- **去除语言切换器的背景色块与边框**：
+  - 重构了侧边栏底部的中英文切换 (`Sidebar.tsx`)，彻底移除了浅色模式下的暖黄色背景色块 (`bg-[#EFECE3]`) 与边框线。
+  - 升级为极简、典雅且高度统一的纯文字排版按钮 (`中文 / EN`)：当前激活项直接以亮眼的橙色 (`text-[#C2593F] font-bold`) 标识，未激活项以柔和的辅助灰色 (`text-stone-500`) 融合，悬停时自动淡入高亮，保证在中/浅/深三色下的绝对一致性与极简美感。
+本次修改文件：
+- frontend/src/components/Sidebar.tsx
+- frontend/src/app/globals.css
+已运行验证：
+- cd frontend; npm run lint -> 0 errors, 0 warnings (全量 ESLint 校验 100% 通过)
+- cd frontend; npm run build -> Next.js Turbopack 生产编译与 TypeScript 静态打包 100% 成功通过
+- cd backend; .\.venv\Scripts\python.exe -m pytest -q -> 69 passed (后端全量测试及流验证全部通过)
+- cd backend; .\.venv\Scripts\ruff.exe check . -> All checks passed!
+当前阻碍：无
+下一步：持续维护项目，根据需求进行迭代和真实环境联调。
+需要用户确认：无
+
+日期：2026-05-24
+当前阶段：前端深色模式悬停与焦点标识（语言切换、搜索框、主题按钮）视觉体验圆满修复
+本次完成：
+- **全面解决深色模式下悬停/焦点标识看不清的问题**：
+  - **搜索输入框及交互高亮完美适配**：针对深色模式下的所有输入框（如主搜索框 `搜索告警ID、标题或资产分类...`、下拉选择框 `select`、多行文本 `textarea`），在 `globals.css` 中增加了专有的悬停（`:hover`）和聚焦（`:focus`）高亮处理规则。鼠标悬停或聚焦时，边框颜色会以 0.15s 平滑过渡到极具科技张力的余烬橙主色 (`hsl(var(--primary))`)，并且聚焦时会产生柔和、优雅且层次丰富的微发光外阴影（`0 0 0 2px rgba(226, 88, 62, 0.15)`），极大地提升了暗色环境下的表单输入焦点可见度。
+  - **语言切换器悬停高亮修复**：由于深色模式下辅助文本类（`.dark .text-stone-500`）自带 `!important` 颜色声明，导致 Tailwind 的 `hover:text-[#C2593F]` 悬停样式被强力覆盖失效。为此在 `globals.css` 中精细追加了对应的 `.dark .hover\:text-\[\#C2593F\]:hover` 及其级联规则。在深色模式下，当鼠标悬停于未激活的“中文”或“EN”按钮上时，文字会极其柔顺地褪去灰钢色，转为高对比的余烬橙主色，完美契合极简无边框字体的动感反馈。
+  - **侧边栏表格行悬停高亮及 ID 联动醒目化**：在 `globals.css` 中补充了 `.dark .group:hover .group-hover\:text-\[\#C2593F\]` 深度级联规则。在深色模式下，当鼠标悬停在告警列表表格的任意一行时，整行不仅会有高级自适应的轻薄背景高亮，而且告警 ID（如 `bruteforce_001` 等）也会自动被唤醒并同步呈现高亮橙色，解决了“鼠标放上去高亮看不清该条目”的体验盲区。
+  - **主题切换按钮悬停边框完美融合**：针对侧边栏底部的主题切换图标（`Sun/Moon` 按钮）在深色下悬停时闪烁亮色背景或高对比亮框的视觉硬折点，在 `globals.css` 中补齐了交互类 hover 边框映射（如 `.hover\:border-\[\#EAE9E4\]:hover`）和 active 按压状态（`.active\:bg-\[\#EFECE3\]:active`），在暗色悬停时平滑转为深邃融合的暗色细框，交互过程极其顺滑自然。
+  - **全站 severity 验证悬停边框对齐**：针对 evals 指标卡片上的多色悬停边框等细节（如 `hover:border-[#B83C25]`, `hover:border-[#C2593F]`, `hover:border-[#D69E2E]`），均在 `globals.css` 中完成了暗态颜色向高对比发光态的无缝重装映射。
+本次修改文件：
+- frontend/src/app/globals.css
+已运行验证：
+- cd frontend; npm run lint -> 0 errors, 0 warnings (全量 ESLint 校验 100% 通过)
+- cd frontend; npm run build -> Next.js Turbopack 生产编译与 TypeScript 静态打包 100% 成功通过
+- cd backend; .\.venv\Scripts\python.exe -m pytest -q -> 69 passed (后端全量测试及流验证全部通过)
+- cd backend; .\.venv\Scripts\ruff.exe check . -> All checks passed!
+当前阻碍：无
+下一步：持续维护项目，根据需求进行迭代和真实环境联调。
+需要用户确认：无
+
+日期：2026-05-24
+当前阶段：前端深色模式极护眼配色（方案B · Cyber Forest & Soft Emerald）切换完成
+本次完成：
+- **无缝切换至极客护眼学术绿配色（方案 B）**：
+  - **深色模式变量重构**：在 `globals.css` 中将暗态 HSL 核心变量全面重写。背景切换为深邃和煦的**墨松绿底** (`#090C0B` / `160 12% 6.5%`)，卡片容器升级为质感极佳的**软松绿石灰** (`#171C1A` / `160 10% 10%`)，正文文本调整为清新高亮且完全防眩光的**淡翡翠瓷白** (`#CBD4D0` / `155 10% 81%`)。
+  - **翡翠绿高亮脉络（Soft Emerald Accent）**：主色（`--primary`）过渡为温润通透的**翡翠绿/薄荷绿** (`#32D782` / `150 70% 54%`)，所有原硬编码的 Rust Orange (`#C2593F`) 按钮背景、聚焦边框、研判激活脉络等全部自动无缝适配为翡翠绿，科技张力与舒适度浑然天成。
+  - **搜索框聚焦阴影同步优化**：搜索输入框在聚焦高亮时，外阴影微光同步调整为翡翠绿色相的 `0 0 0 2px rgba(50, 215, 130, 0.15)`，使得表单聚焦视觉浑然一体。
+  - **侧边栏背景森林级融合**：侧边栏深色背景自适应适配为更深邃通透的**墨松墨墨黑** (`#080A09`)，完美收纳各种状态指示器，带来无与伦比的极客 SOC 体验。
+本次修改文件：
+- frontend/src/app/globals.css
+已运行验证：
+- cd frontend; npm run lint -> 0 errors, 0 warnings (全量 ESLint 校验 100% 通过)
+- cd frontend; npm run build -> Next.js Turbopack 生产编译与 TypeScript 静态打包 100% 成功通过
+- cd backend; .\.venv\Scripts\python.exe -m pytest -q -> 69 passed (后端全量测试及流验证全部通过)
+- cd backend; .\.venv\Scripts\ruff.exe check . -> All checks passed!
+当前阻碍：无
+下一步：持续维护项目，根据需求进行迭代和真实环境联调。
+需要用户确认：无
+
+日期：2026-05-24
+当前阶段：大模型可配置接入与受控动作策略完成
+本次完成：
+- 新增后端 LLM 接入层：`LLMClient` 抽象、Mock Provider、OpenAI-compatible Provider、结构化 `LLMAnalysis` 输出模型和 `LLMConstraints` 约束过滤。
+- Orchestrator 支持可选 LLM 研判：默认仍走确定性流程；启用 LLM 后，会基于本地证据生成结构化研判结果，并写入 `agent_message` timeline。
+- 新增动作权限模式：`recommend_only`、`approval_required`、`auto_approve_simulated`。当前仅支持审批/模拟动作链路，真实防火墙、EDR、SIEM 等处置动作仍未接入。
+- 新增 `GET /api/integrations/llm/status`，返回脱敏后的模型配置、provider、模型名、动作模式和 guardrail 状态，不返回 API Key。
+- 前端新增 `/settings/llm` 大模型配置中心，展示当前 provider、模型、连接状态、动作权限、约束策略和后端环境变量；侧边栏 AI 研判大模型状态改为读取后端 LLM 状态。
+- `.env.example` 补充 LLM 配置项，真实密钥继续只允许放在本地 `.env`。
+本次修改文件：
+- .env.example
+- backend/sentinel_pilot/config.py
+- backend/sentinel_pilot/main.py
+- backend/sentinel_pilot/api/routes_llm.py
+- backend/sentinel_pilot/agent/orchestrator.py
+- backend/sentinel_pilot/services/investigation_service.py
+- backend/sentinel_pilot/llm/*
+- backend/tests/test_llm.py
+- frontend/src/lib/api.ts
+- frontend/src/lib/translations.ts
+- frontend/src/components/Sidebar.tsx
+- frontend/src/app/settings/llm/page.tsx
+- docs/SentinelPilot-development-guide.md
+- docs/development-progress-plan.zh-CN.md
+已运行验证：
+- cd backend; .\.venv\Scripts\python.exe -m pytest tests\test_llm.py -q -> 5 passed
+- cd backend; .\.venv\Scripts\python.exe -m pytest -q -> 74 passed
+- cd backend; .\.venv\Scripts\ruff.exe check . -> All checks passed!
+- cd frontend; npm run lint -> 0 errors
+- cd frontend; npm run build -> Next.js 生产构建成功
+当前阻碍：无
+下一步：如需真实自动处置，单独设计 Response Executor、审计、回滚和厂商适配器，不在本次 LLM 接入中直接执行真实动作。
+需要用户确认：真实处置动作是否只接入测试靶场设备，还是要对接真实企业安全设备；该决定会影响权限、审计和回滚设计。
+
+日期：2026-05-24
+当前阶段：侧边栏英文系统状态指示标对齐修复完成
+本次完成：
+- 修复英文界面下 `AI Coprocessor`、`IM Collaboration` 等系统状态名称换行导致行高不一致的问题。
+- 将侧边栏系统状态行统一为固定三列网格：图标列、单行截断文字列、固定宽高状态标识列。
+- 统一状态标识容器为 `56px x 20px`，避免 `Disabled`、`Ready`、`Online` 因文字长度不同而呈现大小不一。
+本次修改文件：
+- frontend/src/components/Sidebar.tsx
+- docs/development-progress-plan.zh-CN.md
+已运行验证：
+- cd frontend; npm run lint -> 0 errors
+- cd frontend; npm run build -> Next.js 生产构建成功
+- 浏览器实际测量：四个系统状态行高度均为 36px，状态标识容器均为 56px x 20px。
+当前阻碍：无
+下一步：继续根据界面实际观感修复细节问题。
 需要用户确认：无

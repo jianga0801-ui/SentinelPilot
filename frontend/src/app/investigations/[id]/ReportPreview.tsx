@@ -156,7 +156,7 @@ export default function ReportPreview({ report }: ReportPreviewProps) {
   const parseSections = (markdown: string) => {
     const lines = markdown.split('\n');
     const sections: { title: string; key: string; content: string[] }[] = [];
-    let currentSection = { title: 'Executive Summary', key: 'summary', content: [] as string[] };
+    let currentSection = { title: 'Overview', key: 'intro', content: [] as string[] };
 
     const sectionMap: Record<string, string> = {
       'Executive Summary': 'summary',
@@ -173,7 +173,7 @@ export default function ReportPreview({ report }: ReportPreviewProps) {
     lines.forEach(line => {
       const headerMatch = line.match(/^##\s+(.+)$/);
       if (headerMatch) {
-        if (currentSection.content.length > 0) {
+        if (currentSection.content.some(l => l.trim() !== '')) {
           sections.push({ ...currentSection });
         }
 
@@ -189,7 +189,7 @@ export default function ReportPreview({ report }: ReportPreviewProps) {
       }
     });
 
-    if (currentSection.content.length > 0) {
+    if (currentSection.content.some(l => l.trim() !== '')) {
       sections.push(currentSection);
     }
 

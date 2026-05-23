@@ -22,12 +22,15 @@ import { translations, translateFrom } from '@/lib/translations';
 
 const categoryNames: Record<string, { zh: string; en: string }> = {
   credential_access: { zh: '凭据盗取与破解', en: 'Credential Access' },
-  execution: { zh: '恶意命令与脚本执行', en: 'Command & Script Execution' },
-  web_intrusion: { zh: 'Web 漏洞入侵后门', en: 'Web Intrusion' },
-  command_and_control: { zh: '命令控制信道通信', en: 'Command & Control' },
-  lateral_movement: { zh: '内网横向移动渗透', en: 'Lateral Movement' },
-  data_exfiltration: { zh: '敏感业务数据外泄', en: 'Data Exfiltration' },
-  false_positive: { zh: '研发测试业务误报', en: 'Benign False Positive' }
+  authentication: { zh: '身份认证与爆破', en: 'Authentication' },
+  execution: { zh: '恶意命令与脚本', en: 'Script Execution' },
+  suspicious_powershell: { zh: '可疑 PowerShell', en: 'Suspicious PowerShell' },
+  web_intrusion: { zh: 'Web 漏洞与后门', en: 'Web Intrusion' },
+  command_and_control: { zh: '命令控制信道', en: 'Command & Control' },
+  malicious_domain: { zh: '恶意域名通信', en: 'Malicious Domain' },
+  lateral_movement: { zh: '内网横向移动', en: 'Lateral Movement' },
+  data_exfiltration: { zh: '敏感数据外泄', en: 'Data Exfiltration' },
+  false_positive: { zh: '研发测试误报', en: 'False Positive' }
 };
 
 export default function AlertsPage() {
@@ -313,7 +316,7 @@ export default function AlertsPage() {
 
                       {/* Category */}
                       <td className="py-4 px-4">
-                        <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded bg-[#F5F3EB] border border-[#EAE9E4] text-stone-600 font-mono uppercase">
+                        <span className="inline-block whitespace-nowrap text-xs font-semibold px-2.5 py-1 rounded bg-[#F5F3EB] border border-[#EAE9E4] text-stone-600 font-mono uppercase">
                           {language === 'zh' ? (categoryNames[alert.category]?.zh || alert.category) : (categoryNames[alert.category]?.en || alert.category)}
                         </span>
                       </td>

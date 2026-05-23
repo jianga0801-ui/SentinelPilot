@@ -24,6 +24,28 @@
   --radius: 0.375rem;             /* 极简圆角 */
 }
 
+.dark {
+  --background: 220 18% 7%;         /* #0F1115 Deep Cobalt space background */
+  --foreground: 216 10% 80%;         /* #C6CAD2 Gentle metal steel grey text (soft and comfortable) */
+  --card: 220 16% 11%;              /* #171A21 Elegant dark cobalt card container */
+  --card-foreground: 216 10% 80%;
+  --popover: 220 16% 11%;
+  --popover-foreground: 216 10% 80%;
+  --primary: 10 74% 56.5%;          /* #E2583E Vibrant Ember Orange */
+  --primary-foreground: 220 18% 7%;
+  --secondary: 216 8% 57%;          /* #8A909A Muted helper text */
+  --secondary-foreground: 216 10% 80%;
+  --muted: 220 14% 15%;             /* #21252E Muted steel grey container */
+  --muted-foreground: 216 8% 57%;
+  --accent: 10 74% 56.5%;
+  --accent-foreground: 220 18% 7%;
+  --destructive: 8 76% 50%;         /* Cyber red */
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 12% 18%;            /* #2A2F3B Soft cobalt border */
+  --input: 220 12% 18%;
+  --ring: 10 74% 56.5%;
+}
+
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -55,8 +77,8 @@
 }
 
 body {
-  background-color: #FCFAF6;
-  color: #1E2022;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
   font-family: var(--font-sans);
   overflow-x: hidden;
   line-height: 1.6;
@@ -64,8 +86,8 @@ body {
 
 /* 极简纸质卡片面板 */
 .glass-panel {
-  background-color: #FFFFFF;
-  border: 1px solid #EAE9E4;
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
   border-radius: 0.375rem;
 }
 
@@ -73,14 +95,14 @@ body {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .glass-panel-hover:hover {
-  background-color: #FAFAF7;
-  border-color: #C2593F;
+  background-color: hsl(var(--muted));
+  border-color: hsl(var(--primary));
 }
 
 /* 极简纸质代码框 */
 .notebook-panel {
-  background-color: #FBF8F0;
-  border: 1px solid #EAE9E4;
+  background-color: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
   font-family: var(--font-mono);
 }
 
@@ -90,14 +112,243 @@ body {
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #FCFAF6;
+  background: hsl(var(--background));
 }
 ::-webkit-scrollbar-thumb {
-  background: #E2DFD5;
+  background: hsl(var(--border));
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #C2593F;
+  background: hsl(var(--primary));
+}
+
+/* 极简纸质深色模式底层适配，保障硬编码色彩组件的完美过渡 */
+.dark body {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .bg-white {
+  background-color: hsl(var(--card)) !important;
+}
+
+/* 统一适配主背景色硬编码 bg-[#FCFAF6] */
+.dark .bg-\[\#FCFAF6\] {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* 统一适配次背景色硬编码 bg-[#F7F5EF] */
+.dark .bg-\[\#F7F5EF\] {
+  background-color: #0A0C0F !important; /* Sidebar deepest cobalt space (softened) */
+}
+
+/* 统一级联适配淡黄底色面板 bg-[#FAF9F5] 和 bg-[#FBF8F0] */
+.dark .bg-\[\#FAF9F5\],
+.dark .bg-\[\#FBF8F0\],
+.dark .bg-\[\#FAFAF8\] {
+  background-color: hsl(var(--muted)) !important;
+}
+
+/* 统一适配边框色硬编码 border-[#EAE9E4] */
+.dark .border-\[\#EAE9E4\],
+.dark .border-b-\[\#EAE9E4\],
+.dark .border-t-\[\#EAE9E4\],
+.dark .border-r-\[\#EAE9E4\],
+.dark .border-l-\[\#EAE9E4\],
+.dark .border-\[\#EAE6DE\]\/70 {
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .border-b-\[\#EAE9E4\]\/40,
+.dark .border-t-\[\#EAE9E4\]\/60 {
+  border-color: rgba(34, 37, 45, 0.4) !important;
+}
+
+/* 统一级联适配深色字头及标签 text-[#1E2022] / text-[#4A4B4D] / text-neutral-800 */
+.dark .text-\[\#1E2022\],
+.dark .hover\:text-\[\#1E2022\]:hover,
+.dark .text-\[\#4A4B4D\],
+.dark .hover\:text-\[\#4A4B4D\]:hover,
+.dark .text-neutral-800,
+.dark .hover\:text-neutral-800:hover,
+.dark .text-stone-800,
+.dark .hover\:text-stone-800:hover,
+.dark .text-stone-700,
+.dark .hover\:text-stone-700:hover {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* 解决事件研判分析报告中 text-[#2A2B2D] 暗色下字看不见的问题 */
+.dark .text-\[\#2A2B2D\] {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* 适配特定模块的细边框及悬停边框 */
+.dark .border-\[\#E1DEC9\],
+.dark .border-\[\#F3EBE1\],
+.dark .hover\:border-\[\#EAE9E4\]:hover,
+.dark .hover\:border-\[\#D1CDC2\]:hover,
+.dark .hover\:border-stone-400:hover,
+.dark .hover\:border-\[\#8C8E91\]:hover {
+  border-color: hsl(var(--border)) !important;
+}
+
+.dark .hover\:border-\[\#B83C25\]:hover {
+  border-color: #F87171 !important;
+}
+.dark .hover\:border-\[\#C2593F\]:hover {
+  border-color: hsl(var(--primary)) !important;
+}
+.dark .hover\:border-\[\#D69E2E\]:hover {
+  border-color: #FBBF24 !important;
+}
+
+.dark .active\:bg-\[\#EFECE3\]:active {
+  background-color: hsl(var(--muted)) !important;
+}
+
+/* 统一级联适配灰色辅助文本 text-stone-600 / text-stone-500 / text-[#6B6D70] */
+.dark .text-stone-600,
+.dark .text-stone-500,
+.dark .text-\[\#6B6D70\],
+.dark .text-\[\#8C8E91\] {
+  color: hsl(var(--secondary)) !important;
+}
+
+/* 统一级联适配交互悬停色 hover:bg-[#F5F3EB] / hover:bg-[#F0EDE4] */
+.dark .hover\:bg-\[\#F5F3EB\]:hover,
+.dark .hover\:bg-\[\#F5F3EB\]\/50:hover,
+.dark .hover\:bg-\[\#F5F3EB\]\/40:hover,
+.dark .hover\:bg-\[\#F5F3EB\]\/30:hover,
+.dark .hover\:bg-\[\#F0EDE4\]:hover,
+.dark .hover\:bg-\[\#F0EDE4\]\/10:hover {
+  background-color: hsl(var(--muted)) !important;
+}
+
+/* 统一级联适配激活态 bg-[#EFECE3] */
+.dark .bg-\[\#EFECE3\] {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--primary)) !important;
+}
+
+/* 统一适配严重级高危红色 Badge 与高对比文字 */
+.dark .bg-\[\#FCF1EE\],
+.dark .bg-\[\#FCF5EE\],
+.dark .bg-\[\#FCF5EE\]\/40,
+.dark .bg-\[\#FCF5EE\]\/50,
+.dark .hover\:bg-\[\#FCF1EE\]:hover {
+  background-color: rgba(226, 88, 62, 0.12) !important;
+  border-color: rgba(226, 88, 62, 0.25) !important;
+}
+.dark .text-\[\#B83C25\],
+.dark .hover\:text-\[\#B83C25\]:hover {
+  color: #F87171 !important; /* Premium cyber light red */
+}
+
+/* 统一适配中危黄色/橙色 Badge 与文字 */
+.dark .bg-\[\#FAF5E6\],
+.dark .hover\:bg-\[\#FAF5E6\]:hover {
+  background-color: rgba(214, 158, 46, 0.12) !important;
+  border-color: rgba(214, 158, 46, 0.25) !important;
+}
+.dark .text-\[\#A37110\],
+.dark .hover\:text-\[\#A37110\]:hover {
+  color: #FBBF24 !important; /* Premium cyber light amber */
+}
+
+/* 统一适配低危绿色/安全 Badge 与文字 */
+.dark .bg-\[\#F0F6F1\],
+.dark .hover\:bg-\[\#F0F6F1\]:hover {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+.dark .text-\[\#25633A\],
+.dark .hover\:text-\[\#25633A\]:hover {
+  color: #34D399 !important; /* Premium cyber light green */
+}
+
+/* 统一级联适配主色 text-[#C2593F] / bg-[#C2593F] */
+.dark .text-\[\#C2593F\],
+.dark .hover\:text-\[\#C2593F\]:hover,
+.dark .group-hover\:text-\[\#C2593F\]:hover,
+.dark .group:hover .group-hover\:text-\[\#C2593F\],
+.dark .hover\:text-\[\#A94A32\]:hover {
+  color: hsl(var(--primary)) !important;
+}
+.dark .bg-\[\#C2593F\] {
+  background-color: hsl(var(--primary)) !important;
+}
+
+/* 统一级联适配学术报告中的高亮背景 bg-[#FCF5E3] */
+.dark .bg-\[\#FCF5E3\] {
+  background-color: hsl(var(--muted)) !important;
+}
+
+/* 统一级联适配系统状态栏 Badge */
+/* 1. 运行中/未启用等灰色状态 */
+.dark .bg-\[\#EAE9E4\] {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 2. 绿灯状态：已连接/在线 */
+.dark .bg-\[\#EAF5EF\] {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+}
+.dark .text-emerald-700 {
+  color: #34D399 !important;
+}
+
+/* 3. 黄灯状态：连接中/就绪 */
+.dark .bg-\[\#FFF4E5\] {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+}
+.dark .text-amber-600 {
+  color: #FBBF24 !important;
+}
+
+/* 4. 红灯状态：已断开 */
+.dark .bg-\[\#FCE8E6\] {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+}
+.dark .text-rose-700 {
+  color: #F87171 !important;
+}
+
+/* 5. 蓝灯状态：全功能 IM 协同 */
+.dark .bg-\[\#E6F0FD\] {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+  border: 1px solid rgba(59, 130, 246, 0.25) !important;
+}
+.dark .text-blue-700 {
+  color: #60A5FA !important;
+}
+
+/* 统一级联适配输入框背景色 */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.dark input:hover,
+.dark select:hover,
+.dark textarea:hover {
+  border-color: hsl(var(--primary)) !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: hsl(var(--primary)) !important;
+  box-shadow: 0 0 0 2px rgba(226, 88, 62, 0.15) !important;
+  outline: none !important;
 }
 
 /* 原有动画适配（保留极简的简单旋转，删除赛博发光等特效） */

@@ -10,11 +10,13 @@ from sentinel_pilot.api.routes_approvals import router as approvals_router
 from sentinel_pilot.api.routes_evals import router as evals_router
 from sentinel_pilot.api.routes_integrations import router as integrations_router
 from sentinel_pilot.api.routes_investigations import router as investigations_router
+from sentinel_pilot.api.routes_llm import router as llm_router
 from sentinel_pilot.api.routes_reports import router as reports_router
 from sentinel_pilot.api.schemas import ErrorResponse
 from sentinel_pilot.config import settings
 from sentinel_pilot.core.errors import SentinelPilotError
 from sentinel_pilot.integrations.im.notifier import IMNotifier
+from sentinel_pilot.llm.factory import constraints_from_settings, create_llm_client
 from sentinel_pilot.services.approval_service import ApprovalService
 from sentinel_pilot.services.investigation_service import InvestigationService
 from sentinel_pilot.services.report_service import ReportService
@@ -36,12 +38,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.alert_source = alert_source
     app.state.eval_runs = {}
     app.state.im_notifier = IMNotifier(settings)
+    app.state.llm_client = create_llm_client(settings) if settings.llm_enabled else None
+    app.state.llm_constraints = constraints_from_settings(settings)
     app.state.investigation_service = InvestigationService(
         alert_source=alert_source,
         investigations=InvestigationRepository(connection),
         timeline=TimelineRepository(connection),
         approvals=ApprovalRepository(connection),
         im_notifier=app.state.im_notifier,
+        llm_client=app.state.llm_client,
+        llm_constraints=app.state.llm_constraints,
     )
     app.state.approval_service = ApprovalService(
         investigations=InvestigationRepository(connection),
@@ -69,6 +75,7 @@ app.include_router(approvals_router)
 app.include_router(reports_router)
 app.include_router(evals_router)
 app.include_router(integrations_router)
+app.include_router(llm_router)
 
 
 @app.exception_handler(SentinelPilotError)

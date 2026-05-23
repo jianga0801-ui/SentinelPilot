@@ -40,7 +40,7 @@ The initial version does not provide these capabilities:
 - Recreate a full commercial SIEM.
 - Implement multi-tenant access control.
 - Integrate real vendor APIs.
-- Depend on a real model API.
+- Require a real model API for the default local workflow.
 - Depend on a public IP address, domain name, or cloud server for the default local workflow.
 
 ## Confirmed Decisions
@@ -49,6 +49,8 @@ The initial version does not provide these capabilities:
 - Backend: Python 3.11+, FastAPI, Pydantic v2, SQLite, pytest, Ruff.
 - Frontend: Next.js, TypeScript, Tailwind CSS.
 - Initial model mode: rules, templates, and mock model.
+- Optional model integration: OpenAI-compatible LLM providers can be enabled by environment
+  configuration, but tests and the default local workflow must keep working without a real model API.
 - Initial data source: `MockAlertSource` and offline sample logs.
 - Initial IM integration: DingTalk interactive approval cards; markdown webhook notifications remain a fallback.
 - Initial response actions: simulated only.
@@ -282,6 +284,9 @@ Only `running` and `waiting_approval` investigations can be cancelled. `complete
 ## Agent Workflow
 
 The initial version uses a deterministic orchestrator. It does not require a real model API.
+When LLM integration is enabled, the model acts as a structured investigation coprocessor after
+local evidence collection. It can suggest severity, category, MITRE techniques, summary text, and
+recommended response actions. It must not call tools directly or execute real response actions.
 
 ```text
 1. Load the alert.
@@ -290,13 +295,28 @@ The initial version uses a deterministic orchestrator. It does not require a rea
 4. Search the knowledge base.
 5. Map the behavior to MITRE ATT&CK.
 6. Determine severity and category.
+6a. Optionally ask the configured LLM for structured analysis and recommended actions.
 7. Create approval requests for high-risk actions.
 8. Generate the final report.
 ```
 
 Timeline events are written inline after each step, not in a final batch.
+LLM outputs are recorded as `agent_message` timeline events. Output must pass the local Pydantic
+schema and guardrail filtering before it can affect an investigation.
 
 Future versions can replace the deterministic orchestrator with LangGraph or OpenAI Agents SDK. The public API and data models should remain stable.
+
+LLM guardrails:
+
+- LLM provider configuration is read from environment variables.
+- API keys are never returned by API responses.
+- The model must return structured JSON matching the local `LLMAnalysis` schema.
+- Recommended actions are filtered by an allowlist.
+- `recommend_only` mode records recommendations without creating approval records.
+- `approval_required` mode can create approval records for allowed model-recommended actions.
+- `auto_approve_simulated` mode can auto-approve simulated actions only.
+- Real firewall, EDR, SIEM, or cloud security changes remain disabled until an enterprise response
+  integration is explicitly designed and approved.
 
 ## Tools
 
@@ -776,6 +796,41 @@ Response:
   "last_error": null
 }
 ```
+
+### Get LLM Status
+
+```http
+GET /api/integrations/llm/status
+```
+
+Response:
+
+```json
+{
+  "enabled": false,
+  "provider": "mock",
+  "model": "",
+  "base_url_configured": false,
+  "api_key_configured": false,
+  "prompt_profile": "default",
+  "temperature": 0.2,
+  "timeout_seconds": 30,
+  "action_mode": "approval_required",
+  "constraints": {
+    "structured_output_required": true,
+    "allowed_actions": ["block_ip", "isolate_host", "disable_user", "collect_artifact", "notify_owner"],
+    "action_mode": "approval_required",
+    "high_risk_actions_allowed": true,
+    "high_risk_requires_approval": true,
+    "real_response_actions_enabled": false,
+    "secrets_hidden": true
+  },
+  "supported_providers": ["mock", "openai_compatible"],
+  "supported_action_modes": ["recommend_only", "approval_required", "auto_approve_simulated"]
+}
+```
+
+This endpoint returns a sanitized configuration view. It must not include API keys or raw secrets.
 
 ### Send a Test IM Notification
 
@@ -1325,6 +1380,18 @@ DINGTALK_CARD_CALLBACK_URL=
 DINGTALK_CARD_CALLBACK_SECRET=
 
 PUBLIC_APP_URL=http://localhost:3000
+
+# Optional LLM integration.
+LLM_ENABLED=false
+LLM_PROVIDER=mock
+LLM_BASE_URL=
+LLM_API_KEY=
+LLM_MODEL=
+LLM_TEMPERATURE=0.2
+LLM_TIMEOUT_SECONDS=30
+LLM_PROMPT_PROFILE=default
+LLM_ACTION_MODE=approval_required
+LLM_ALLOW_HIGH_RISK_ACTIONS=true
 ```
 
 `PUBLIC_APP_URL` is the frontend base URL used in DingTalk messages. Notification links should point to investigation pages, approval panels, or reports under this URL.
@@ -1543,6 +1610,7 @@ Before merging a stage, verify:
 - The stage exit criteria pass.
 - API fields match the API contract.
 - Tests run without real model APIs.
+- Default LLM tests use the mock provider or local fakes only.
 - Tests run without real security devices.
 - Tests run without IM webhook configuration.
 - No real secret is committed.

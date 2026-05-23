@@ -56,6 +56,7 @@ export function toEvalRunSummary(realResult: BackendEvalRunResult): EvalRunSumma
       approval_match: realCase.scores?.approval_match ?? false,
       report_evidence_match: realCase.scores?.report_evidence_match ?? false,
       diagnostics: realCase.notes?.length ? realCase.notes.join('；') : mockCase.diagnostics,
+      diagnostics_en: realCase.notes?.length ? realCase.notes.join('; ') : mockCase.diagnostics_en,
     };
   });
   const totalCases = cases.length;

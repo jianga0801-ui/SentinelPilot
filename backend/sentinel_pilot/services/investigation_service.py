@@ -4,6 +4,7 @@ from sentinel_pilot.agent.tool_registry import ToolRegistry
 from sentinel_pilot.core.errors import SentinelPilotError
 from sentinel_pilot.core.models import Investigation, TimelineItem
 from sentinel_pilot.integrations.im.notifier import IMNotifier
+from sentinel_pilot.llm.base import LLMClient, LLMConstraints
 from sentinel_pilot.storage.repositories import (
     ApprovalRepository,
     InvestigationRepository,
@@ -20,6 +21,8 @@ class InvestigationService:
         registry: ToolRegistry | None = None,
         approvals: ApprovalRepository | None = None,
         im_notifier: IMNotifier | None = None,
+        llm_client: LLMClient | None = None,
+        llm_constraints: LLMConstraints | None = None,
     ) -> None:
         self.alert_source = alert_source
         self.investigations = investigations
@@ -27,6 +30,8 @@ class InvestigationService:
         self.registry = registry
         self.approvals = approvals
         self.im_notifier = im_notifier
+        self.llm_client = llm_client
+        self.llm_constraints = llm_constraints
 
     def create(self, alert_id: str) -> Investigation:
         alert = self.alert_source.get_alert(alert_id)
@@ -68,6 +73,8 @@ class InvestigationService:
                 registry=self.registry,
                 approvals=self.approvals,
                 im_notifier=self.im_notifier,
+                llm_client=self.llm_client,
+                llm_constraints=self.llm_constraints,
             ).run(investigation_id)
         except Exception:
             return self.investigations.mark_failed(

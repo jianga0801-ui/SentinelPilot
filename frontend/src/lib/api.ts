@@ -117,6 +117,29 @@ export interface IMStatus {
   last_error?: string | null;
 }
 
+export interface LLMStatus {
+  enabled: boolean;
+  provider: string;
+  model: string;
+  base_url_configured: boolean;
+  api_key_configured: boolean;
+  prompt_profile: string;
+  temperature: number;
+  timeout_seconds: number;
+  action_mode: 'recommend_only' | 'approval_required' | 'auto_approve_simulated';
+  constraints: {
+    structured_output_required: boolean;
+    allowed_actions: string[];
+    action_mode: string;
+    high_risk_actions_allowed: boolean;
+    high_risk_requires_approval: boolean;
+    real_response_actions_enabled: boolean;
+    secrets_hidden: boolean;
+  };
+  supported_providers: string[];
+  supported_action_modes: string[];
+}
+
 // Report Structure
 export interface Report {
   id: string;
@@ -150,6 +173,7 @@ export interface EvalCaseResult {
 
   passed: boolean;
   diagnostics: string;
+  diagnostics_en?: string;
 }
 
 export interface EvalRunSummary {
@@ -265,5 +289,9 @@ export const api = {
 
   async getIMStatus(): Promise<IMStatus> {
     return request<IMStatus>('/integrations/im/status');
+  },
+
+  async getLLMStatus(): Promise<LLMStatus> {
+    return request<LLMStatus>('/integrations/llm/status');
   }
 };

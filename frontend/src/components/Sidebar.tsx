@@ -9,16 +9,30 @@ import {
   Cpu,
   Activity,
   Workflow,
-  MessageSquare
+  MessageSquare,
+  Settings2,
+  Sun,
+  Moon
 } from 'lucide-react';
-import { api, type IMStatus } from '@/lib/api';
+import { api, type IMStatus, type LLMStatus } from '@/lib/api';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useTheme } from '@/lib/ThemeContext';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [healthStatus, setHealthStatus] = useState<'connecting' | 'online' | 'offline'>('connecting');
   const [imStatus, setIMStatus] = useState<IMStatus | null>(null);
+  const [llmStatus, setLLMStatus] = useState<LLMStatus | null>(null);
   const { language, setLanguage, t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      setMounted(true);
+    });
+    return () => cancelAnimationFrame(handle);
+  }, []);
 
   useEffect(() => {
     const checkHealth = async () => {
@@ -26,15 +40,21 @@ export default function Sidebar() {
         const res = await api.checkHealth();
         if (res?.status === 'ok') {
           setHealthStatus('online');
-          const status = await api.getIMStatus();
-          setIMStatus(status);
+          const [im, llm] = await Promise.all([
+            api.getIMStatus(),
+            api.getLLMStatus(),
+          ]);
+          setIMStatus(im);
+          setLLMStatus(llm);
         } else {
           setHealthStatus('offline');
           setIMStatus(null);
+          setLLMStatus(null);
         }
       } catch {
         setHealthStatus('offline');
         setIMStatus(null);
+        setLLMStatus(null);
       }
     };
 
@@ -46,6 +66,7 @@ export default function Sidebar() {
   const navItems = [
     { name: t('sidebar', 'alertInbox'), href: '/alerts', icon: ShieldAlert },
     { name: t('sidebar', 'evalDashboard'), href: '/evals', icon: Workflow },
+    { name: t('sidebar', 'llmConfig'), href: '/settings/llm', icon: Settings2 },
   ];
 
   return (
@@ -80,125 +101,158 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded font-medium text-sm transition-all duration-150 ${
+              className={`grid h-10 grid-cols-[16px_minmax(0,1fr)] items-center gap-3 px-4 rounded font-medium text-sm transition-all duration-150 ${
                 isActive
                   ? 'bg-[#EFECE3] text-[#C2593F] font-semibold border-l-2 border-[#C2593F] pl-3.5'
                   : 'text-stone-600 hover:bg-[#F0EDE4] hover:text-[#1E2022] border-l-2 border-transparent'
               }`}
+              title={item.name}
             >
               <Icon className={`w-4 h-4 ${isActive ? 'text-[#C2593F]' : 'text-stone-500'}`} />
-              <span>{item.name}</span>
+              <span className="min-w-0 truncate whitespace-nowrap">{item.name}</span>
             </Link>
           );
         })}
 
-        {/* Dummy/Roadmap categories */}
+        {/* System Status */}
         <div className="pt-6 px-3 mb-2 text-[10px] font-bold text-[#6B6D70] tracking-wider uppercase font-sans">
-          {t('sidebar', 'systemControl')}
+          {t('sidebar', 'systemStatus')}
         </div>
-        <div className="space-y-1">
-          <div className="flex items-center gap-3 px-4 py-2 text-xs text-stone-500 cursor-not-allowed select-none rounded">
-            <Cpu className="w-3.5 h-3.5 text-stone-400" />
-            <span>{t('sidebar', 'coprocessor')}</span>
-            <span className="ml-auto text-[8px] bg-[#EAE9E4] text-[#6B6D70] px-1.5 py-0.5 rounded font-mono font-medium">{t('sidebar', 'running')}</span>
-          </div>
-          <div className="flex items-center gap-3 px-4 py-2 text-xs text-stone-500 cursor-not-allowed select-none rounded">
-            <Terminal className="w-3.5 h-3.5 text-stone-400" />
-            <span>{t('sidebar', 'decider')}</span>
-            <span className="ml-auto text-[8px] bg-[#EFECE3] text-[#C2593F] px-1.5 py-0.5 rounded font-mono font-medium">{t('sidebar', 'ready')}</span>
-          </div>
+        <div className="space-y-0.5">
+          {/* AI Coprocessor */}
+          <StatusRow
+            title={t('sidebar', 'coprocessorTip')}
+            icon={<Cpu className={`w-4 h-4 transition-colors ${llmStatus?.enabled ? 'text-violet-500 group-hover:text-violet-600' : 'text-stone-400 group-hover:text-stone-500'}`} />}
+            label={t('sidebar', 'coprocessor')}
+            badge={llmStatus?.enabled ? t('sidebar', 'running') : t('sidebar', 'dtDisabled')}
+            badgeClass={llmStatus?.enabled ? 'bg-[#F1EAFE] text-violet-700' : 'bg-[#EAE9E4] text-[#6B6D70]'}
+          />
+
+          {/* Auto Decider */}
+          <StatusRow
+            title={t('sidebar', 'deciderTip')}
+            icon={<Terminal className="w-4 h-4 text-stone-400 group-hover:text-stone-500 transition-colors" />}
+            label={t('sidebar', 'decider')}
+            badge={t('sidebar', 'ready')}
+            badgeClass="bg-[#EFECE3] text-[#C2593F]"
+          />
+
+          {/* Backend API */}
+          <StatusRow
+            title={t('sidebar', 'backendStatusTip')}
+            icon={<Activity className={`w-4 h-4 transition-colors ${healthStatus === 'online' ? 'text-emerald-500 group-hover:text-emerald-600' : 'text-stone-400 group-hover:text-stone-500'}`} />}
+            label={t('sidebar', 'backendStatus')}
+            badge={
+              healthStatus === 'online' ? t('sidebar', 'serviceOnline') :
+              healthStatus === 'connecting' ? t('sidebar', 'serviceConnecting') :
+              t('sidebar', 'serviceOffline')
+            }
+            badgeClass={
+              healthStatus === 'online' ? 'bg-[#EAF5EF] text-emerald-700' :
+              healthStatus === 'connecting' ? 'bg-[#FFF4E5] text-amber-600' :
+              'bg-[#FCE8E6] text-rose-700'
+            }
+          />
+
+          {/* IM Collaboration */}
+          <StatusRow
+            title={imStatus?.enabled
+              ? (imStatus.callback_enabled ? t('sidebar', 'dtFullTip') : t('sidebar', 'dtNotifyTip'))
+              : t('sidebar', 'dtDisabledTip')}
+            icon={<MessageSquare className={`w-4 h-4 transition-colors ${imStatus?.enabled ? 'text-blue-500 group-hover:text-blue-600' : 'text-stone-400 group-hover:text-stone-500'}`} />}
+            label={t('sidebar', 'imCollaboration')}
+            badge={
+              imStatus?.enabled
+                ? (imStatus.callback_enabled ? t('sidebar', 'dtFull') : t('sidebar', 'dtNotify'))
+                : t('sidebar', 'dtDisabled')
+            }
+            badgeClass={
+              imStatus?.enabled
+                ? (imStatus.callback_enabled ? 'bg-[#E6F0FD] text-blue-700' : 'bg-[#EAF5EF] text-emerald-700')
+                : 'bg-[#EAE9E4] text-[#6B6D70]'
+            }
+          />
         </div>
       </nav>
 
-      {/* Language Switcher Pill Control */}
-      <div className="px-6 py-3 border-t border-[#EAE9E4] flex items-center justify-center gap-1 text-xs bg-[#FAF9F5]">
-        <button
-          onClick={() => setLanguage('zh')}
-          className={`px-3 py-1 rounded border transition-all duration-150 font-medium ${
-            language === 'zh'
-              ? 'bg-[#EFECE3] border-[#C2593F] text-[#C2593F] font-semibold'
-              : 'border-transparent text-stone-500 hover:text-stone-800 hover:bg-[#F0EDE4]'
-          }`}
-        >
-          简体中文
-        </button>
-        <span className="text-stone-300">|</span>
-        <button
-          onClick={() => setLanguage('en')}
-          className={`px-3 py-1 rounded border transition-all duration-150 font-medium ${
-            language === 'en'
-              ? 'bg-[#EFECE3] border-[#C2593F] text-[#C2593F] font-semibold'
-              : 'border-transparent text-stone-500 hover:text-stone-800 hover:bg-[#F0EDE4]'
-          }`}
-        >
-          English
-        </button>
-      </div>
-
-      {/* Footer Health Check */}
-      <div className="p-4 border-t border-[#EAE9E4] bg-[#F2EFE8] space-y-2">
-        <div className="flex items-center gap-3 px-3 py-2 rounded bg-[#FAF9F5] border border-[#EAE9E4]">
-          <div className="relative flex items-center justify-center">
-            {healthStatus === 'online' && (
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-            )}
-            {healthStatus === 'connecting' && (
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-            )}
-            {healthStatus === 'offline' && (
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
-            )}
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <span className="text-[9px] text-[#6B6D70] font-sans font-bold uppercase tracking-wider block leading-none">
-              {t('sidebar', 'backendStatus')}
-            </span>
-            <span className="text-xs font-semibold font-mono text-[#1E2022] truncate block mt-0.5">
-              {healthStatus === 'online' && t('sidebar', 'serviceOnline')}
-              {healthStatus === 'connecting' && t('sidebar', 'serviceConnecting')}
-              {healthStatus === 'offline' && t('sidebar', 'serviceOffline')}
-            </span>
-          </div>
-          <Activity className={`w-3.5 h-3.5 ${healthStatus === 'online' ? 'text-emerald-600' : 'text-stone-400'}`} />
-        </div>
-
-        <div className="flex items-center gap-3 px-3 py-2 rounded bg-[#FAF9F5] border border-[#EAE9E4]">
-          <div className="relative flex items-center justify-center">
-            <span
-              className={`w-2.5 h-2.5 rounded-full ${
-                imStatus?.enabled
-                  ? imStatus.callback_enabled
-                    ? 'bg-emerald-600'
-                    : 'bg-amber-500'
-                  : 'bg-stone-400'
-              }`}
-            />
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <span className="text-[9px] text-[#6B6D70] font-sans font-bold uppercase tracking-wider block leading-none">
-              {language === 'zh' ? '钉钉集成' : 'DingTalk IM'}
-            </span>
-            <span className="text-xs font-semibold font-mono text-[#1E2022] truncate block mt-0.5">
-              {imStatus?.enabled
-                ? imStatus.callback_enabled
-                  ? language === 'zh'
-                    ? '互动卡片审批已启用'
-                    : 'Card approval enabled'
-                  : language === 'zh'
-                    ? '通知已启用'
-                    : 'Notifications enabled'
-                : language === 'zh'
-                  ? '未启用'
-                  : 'Disabled'}
-            </span>
-          </div>
-          <MessageSquare
-            className={`w-3.5 h-3.5 ${
-              imStatus?.enabled ? 'text-emerald-600' : 'text-stone-400'
+      {/* Footer Controls (Language + Theme Switcher) */}
+      <div className="px-5 py-3 border-t border-[#EAE9E4] flex items-center justify-between text-xs bg-[#FAF9F5] transition-colors duration-200">
+        {/* Language Switcher */}
+        <div className="flex items-center gap-1.5 font-mono text-[11px]">
+          <button
+            onClick={() => setLanguage('zh')}
+            className={`transition-all duration-150 cursor-pointer font-bold ${
+              language === 'zh'
+                ? 'text-[#C2593F]'
+                : 'text-stone-500 hover:text-[#C2593F]'
             }`}
-          />
+          >
+            中文
+          </button>
+          <span className="text-stone-300 dark:text-stone-700">/</span>
+          <button
+            onClick={() => setLanguage('en')}
+            className={`transition-all duration-150 cursor-pointer font-bold ${
+              language === 'en'
+                ? 'text-[#C2593F]'
+                : 'text-stone-500 hover:text-[#C2593F]'
+            }`}
+          >
+            EN
+          </button>
         </div>
+
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          title={mounted ? (theme === 'light' ? (language === 'zh' ? '切换至深色模式' : 'Switch to Dark Mode') : (language === 'zh' ? '切换至浅色模式' : 'Switch to Light Mode')) : ''}
+          className="p-1.5 rounded-full border border-transparent hover:border-[#EAE9E4] hover:bg-[#F5F3EB] text-stone-500 hover:text-[#C2593F] transition-all duration-150 cursor-pointer active:scale-95 flex items-center justify-center"
+        >
+          {mounted ? (
+            theme === 'light' ? (
+              <Moon className="w-3.5 h-3.5" />
+            ) : (
+              <Sun className="w-3.5 h-3.5" />
+            )
+          ) : (
+            <div className="w-3.5 h-3.5" />
+          )}
+        </button>
       </div>
+
+
     </aside>
+  );
+}
+
+function StatusRow({
+  title,
+  icon,
+  label,
+  badge,
+  badgeClass,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  label: string;
+  badge: string;
+  badgeClass: string;
+}) {
+  return (
+    <div
+      title={title}
+      className="grid h-9 grid-cols-[16px_minmax(0,1fr)_56px] items-center gap-3 px-4 text-[13px] font-medium text-stone-600 cursor-help select-none rounded group relative hover:bg-[#F0EDE4] transition-colors"
+    >
+      <div className="flex items-center justify-center">{icon}</div>
+      <span className="min-w-0 truncate whitespace-nowrap" title={label}>
+        {label}
+      </span>
+      <span
+        className={`inline-flex h-5 w-14 items-center justify-center rounded px-1 text-center font-mono text-[9px] leading-none ${badgeClass}`}
+        title={badge}
+      >
+        <span className="max-w-full truncate">{badge}</span>
+      </span>
+    </div>
   );
 }
