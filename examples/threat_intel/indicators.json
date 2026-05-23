@@ -1,0 +1,244 @@
+[
+  {
+    "indicator": "203.0.113.10",
+    "indicator_type": "ip",
+    "reputation": "suspicious",
+    "labels": [
+      "ssh-bruteforce",
+      "recent-activity"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "203.0.113.77",
+    "indicator_type": "ip",
+    "reputation": "malicious",
+    "labels": [
+      "c2",
+      "known-beacon",
+      "malware"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "198.51.100.44",
+    "indicator_type": "ip",
+    "reputation": "suspicious",
+    "labels": [
+      "web-attack",
+      "previous-intrusion"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "192.168.1.53",
+    "indicator_type": "ip",
+    "reputation": "malicious",
+    "labels": [
+      "c2",
+      "payload-host",
+      "internal-scan"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "198.51.100.99",
+    "indicator_type": "ip",
+    "reputation": "suspicious",
+    "labels": [
+      "ssh-bruteforce",
+      "scan-probe"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "10.10.10.100",
+    "indicator_type": "ip",
+    "reputation": "unknown",
+    "labels": [
+      "powershell-c2",
+      "unverified"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "203.0.113.99",
+    "indicator_type": "ip",
+    "reputation": "suspicious",
+    "labels": [
+      "rdp-target",
+      "lateral-movement"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "10.0.0.55",
+    "indicator_type": "ip",
+    "reputation": "benign",
+    "labels": [
+      "internal-infrastructure"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "192.0.2.20",
+    "indicator_type": "ip",
+    "reputation": "benign",
+    "labels": [
+      "vuln-scanner",
+      "approved-security-tool"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "203.0.113.50",
+    "indicator_type": "ip",
+    "reputation": "malicious",
+    "labels": [
+      "phishing-panel",
+      "credential-harvesting"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "update-check.example.net",
+    "indicator_type": "domain",
+    "reputation": "malicious",
+    "labels": [
+      "c2",
+      "dga-like",
+      "known-malicious"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "cdn-package.example.com",
+    "indicator_type": "domain",
+    "reputation": "suspicious",
+    "labels": [
+      "typosquat",
+      "lookalike-domain"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "evil-payload.example.org",
+    "indicator_type": "domain",
+    "reputation": "malicious",
+    "labels": [
+      "payload-delivery",
+      "malware-hosting"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "malware-staging.example.net",
+    "indicator_type": "domain",
+    "reputation": "suspicious",
+    "labels": [
+      "staging",
+      "exfil-prep"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "stealth-exfil.example.com",
+    "indicator_type": "domain",
+    "reputation": "malicious",
+    "labels": [
+      "data-exfiltration",
+      "c2"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "pwned-ctrl.example.org",
+    "indicator_type": "domain",
+    "reputation": "suspicious",
+    "labels": [
+      "botnet-ctrl",
+      "unknown"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "cdnjs.cloudflare.com",
+    "indicator_type": "domain",
+    "reputation": "benign",
+    "labels": [
+      "cdn",
+      "legitimate-service"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "indicator_type": "hash",
+    "reputation": "malicious",
+    "labels": [
+      "webshell",
+      "aspx-web-shell"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b",
+    "indicator_type": "hash",
+    "reputation": "suspicious",
+    "labels": [
+      "powershell",
+      "trojan-downloader"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "f1e2d3c4b5a69788796a5b4c3d2e1f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+    "indicator_type": "hash",
+    "reputation": "malicious",
+    "labels": [
+      "beacon",
+      "c2-payload"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "bbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "indicator_type": "hash",
+    "reputation": "suspicious",
+    "labels": [
+      "ps1",
+      "script-malware"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "ccccccccdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "indicator_type": "hash",
+    "reputation": "malicious",
+    "labels": [
+      "webshell",
+      "cmd-web-shell"
+    ],
+    "source": "local-sample"
+  },
+  {
+    "indicator": "ddddddeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "indicator_type": "hash",
+    "reputation": "unknown",
+    "labels": [
+      "unverified-sample",
+      "pending-analysis"
+    ],
+    "source": "external-feed"
+  },
+  {
+    "indicator": "eeeeeeefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "indicator_type": "hash",
+    "reputation": "suspicious",
+    "labels": [
+      "ransomware",
+      "preliminary-match"
+    ],
+    "source": "local-sample"
+  }
+]

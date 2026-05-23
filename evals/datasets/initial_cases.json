@@ -1,0 +1,67 @@
+[
+  {
+    "case_id": "eval_bruteforce_001",
+    "alert_id": "alert_bruteforce_001",
+    "expected_severity": "high",
+    "expected_category": "credential_access",
+    "expected_mitre": [
+      "T1110"
+    ],
+    "requires_approval": true,
+    "expected_approval_type": "block_ip"
+  },
+  {
+    "case_id": "eval_powershell_001",
+    "alert_id": "alert_powershell_001",
+    "expected_severity": "high",
+    "expected_category": "execution",
+    "expected_mitre": [
+      "T1059.001"
+    ],
+    "requires_approval": true,
+    "expected_approval_type": "isolate_host"
+  },
+  {
+    "case_id": "eval_webshell_001",
+    "alert_id": "alert_webshell_001",
+    "expected_severity": "high",
+    "expected_category": "web_intrusion",
+    "expected_mitre": [
+      "T1505.003"
+    ],
+    "requires_approval": false,
+    "expected_approval_type": null
+  },
+  {
+    "case_id": "eval_malicious_domain_001",
+    "alert_id": "alert_malicious_domain_001",
+    "expected_severity": "medium",
+    "expected_category": "command_and_control",
+    "expected_mitre": [
+      "T1071.001"
+    ],
+    "requires_approval": false,
+    "expected_approval_type": null
+  },
+  {
+    "case_id": "eval_lateral_movement_001",
+    "alert_id": "alert_lateral_movement_001",
+    "expected_severity": "high",
+    "expected_category": "lateral_movement",
+    "expected_mitre": [
+      "T1021.002",
+      "T1021.006"
+    ],
+    "requires_approval": true,
+    "expected_approval_type": "isolate_host"
+  },
+  {
+    "case_id": "eval_false_positive_001",
+    "alert_id": "alert_false_positive_001",
+    "expected_severity": "low",
+    "expected_category": "false_positive",
+    "expected_mitre": [],
+    "requires_approval": false,
+    "expected_approval_type": null
+  }
+]

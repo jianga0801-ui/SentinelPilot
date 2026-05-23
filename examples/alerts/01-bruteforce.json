@@ -1,0 +1,115 @@
+{
+  "id": "alert_bruteforce_001",
+  "title": "SSH brute force against admin",
+  "description": "Multiple failed SSH logins followed by one successful login.",
+  "source": "mock",
+  "vendor": null,
+  "product": null,
+  "device_type": "mock",
+  "severity": "medium",
+  "category": "authentication",
+  "status": "new",
+  "entities": {
+    "src_ip": "203.0.113.10",
+    "dst_host": "linux-web-01",
+    "username": "admin"
+  },
+  "time_range": {
+    "start": "2026-05-22T09:50:00Z",
+    "end": "2026-05-22T10:10:00Z"
+  },
+  "raw": {
+    "sample": "ssh_bruteforce",
+    "vendor": "OpenSSH",
+    "product": "sshd",
+    "detection_type": "auth_log_analysis",
+    "failed_attempts": 175,
+    "unique_usernames": [
+      "admin",
+      "root",
+      "oracle",
+      "test",
+      "postgres",
+      "www-data",
+      "ubuntu",
+      "deploy"
+    ],
+    "unique_src_ips": [
+      "203.0.113.10",
+      "198.51.100.99",
+      "10.0.0.55"
+    ],
+    "attack_waves": 3,
+    "total_attempts": 175,
+    "successful_login": true,
+    "success_time": "2026-05-22T10:03:00Z",
+    "successful_usernames": [
+      "admin",
+      "root",
+      "ubuntu"
+    ],
+    "mean_auth_interval_seconds": 4.2,
+    "geoip_asn": "AS39452",
+    "geoip_country": "XX",
+    "session_duration_seconds": 45,
+    "auth_log_entries": [
+      {
+        "time": "2026-05-22T09:50:12Z",
+        "message": "Failed password for admin from 203.0.113.10 port 39281 ssh2"
+      },
+      {
+        "time": "2026-05-22T09:50:45Z",
+        "message": "Failed password for root from 203.0.113.10 port 39282 ssh2"
+      },
+      {
+        "time": "2026-05-22T09:51:18Z",
+        "message": "Failed password for oracle from 203.0.113.10 port 39295 ssh2"
+      },
+      {
+        "time": "2026-05-22T09:52:10Z",
+        "message": "Failed password for test from 203.0.113.10 port 39310 ssh2"
+      },
+      {
+        "time": "2026-05-22T09:55:10Z",
+        "message": "Failed password for admin from 198.51.100.99 port 50001 ssh2"
+      },
+      {
+        "time": "2026-05-22T09:57:30Z",
+        "message": "Failed password for postgres from 203.0.113.10 port 39420 ssh2"
+      },
+      {
+        "time": "2026-05-22T10:01:00Z",
+        "message": "Failed password for www-data from 203.0.113.10 port 39800 ssh2"
+      },
+      {
+        "time": "2026-05-22T10:03:00Z",
+        "message": "Accepted password for admin from 203.0.113.10 port 39401 ssh2"
+      },
+      {
+        "time": "2026-05-22T10:03:02Z",
+        "message": "session opened for user admin by (uid=0)"
+      },
+      {
+        "time": "2026-05-22T10:03:45Z",
+        "message": "session closed for user admin"
+      },
+      {
+        "time": "2026-05-22T10:05:00Z",
+        "message": "Failed password for ubuntu from 10.0.0.55 port 41000 ssh2"
+      },
+      {
+        "time": "2026-05-22T10:08:00Z",
+        "message": "Failed password for deploy from 203.0.113.10 port 42000 ssh2"
+      },
+      {
+        "time": "2026-05-22T10:10:00Z",
+        "message": "Failed password for admin from 203.0.113.10 port 42500 ssh2"
+      }
+    ],
+    "detection_method": "threshold_based",
+    "threshold_exceeded": true,
+    "threshold_count": 50,
+    "threshold_window_seconds": 300
+  },
+  "created_at": "2026-05-22T10:00:00Z"
+}

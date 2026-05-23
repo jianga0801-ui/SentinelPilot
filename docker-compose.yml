@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - IM_PROVIDER=dingtalk
+      - IM_NOTIFICATION_ENABLED=${IM_NOTIFICATION_ENABLED:-false}
+      - PUBLIC_APP_URL=http://localhost:3000
+      - DATABASE_URL=sqlite:///./data/sentinel_pilot.db
+      - DINGTALK_WEBHOOK_URL=${DINGTALK_WEBHOOK_URL:-}
+      - DINGTALK_SECRET=${DINGTALK_SECRET:-}
+      - DINGTALK_CLIENT_ID=${DINGTALK_CLIENT_ID:-}
+      - DINGTALK_CLIENT_SECRET=${DINGTALK_CLIENT_SECRET:-}
+      - DINGTALK_ROBOT_CODE=${DINGTALK_ROBOT_CODE:-}
+      - DINGTALK_OPEN_CONVERSATION_ID=${DINGTALK_OPEN_CONVERSATION_ID:-}
+      - DINGTALK_CARD_TEMPLATE_ID=${DINGTALK_CARD_TEMPLATE_ID:-}
+      - DINGTALK_CARD_CALLBACK_URL=${DINGTALK_CARD_CALLBACK_URL:-}
+      - DINGTALK_CARD_CALLBACK_SECRET=${DINGTALK_CARD_CALLBACK_SECRET:-}
+    volumes:
+      - sentinelpilot-backend-data:/app/backend/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - BACKEND_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  sentinelpilot-backend-data:

@@ -1,0 +1,56 @@
+{
+  "id": "alert_malicious_domain_001",
+  "title": "Malicious domain access",
+  "description": "Host resolved and connected to a domain listed in local threat intelligence.",
+  "source": "mock",
+  "vendor": null,
+  "product": null,
+  "device_type": "mock",
+  "severity": "medium",
+  "category": "malicious_domain",
+  "status": "new",
+  "entities": {
+    "host": "win-ops-03",
+    "domain": "update-check.example.net",
+    "dst_ip": "203.0.113.77"
+  },
+  "time_range": {
+    "start": "2026-05-22T12:45:00Z",
+    "end": "2026-05-22T14:45:00Z"
+  },
+  "raw": {
+    "sample": "malicious_domain_access",
+    "vendor": "Infoblox",
+    "product": "DNS Firewall",
+    "detection_type": "dns_query_threat_match",
+    "rule_name": "c2-domain-blocklist",
+    "dns_query": "update-check.example.net",
+    "dns_subdomains_queried": [
+      "update-check.example.net",
+      "api.update-check.example.net",
+      "cdn.update-check.example.net",
+      "static.update-check.example.net",
+      "download.update-check.example.net"
+    ],
+    "query_type": "A",
+    "resolved_ip": "203.0.113.77",
+    "source_process": "svchost.exe",
+    "source_pid": 1024,
+    "beacon_interval_seconds": 300,
+    "total_dns_queries": 30,
+    "total_connections": 25,
+    "connection_count": 25,
+    "connection_protocols": [
+      "HTTPS",
+      "HTTP"
+    ],
+    "persistence_duration_minutes": 120,
+    "threat_feed_source": "local-sample",
+    "threat_category": "c2_beacon",
+    "confidence_score": 85,
+    "mitre_techniques": [
+      "T1071.001"
+    ]
+  },
+  "created_at": "2026-05-22T13:00:00Z"
+}

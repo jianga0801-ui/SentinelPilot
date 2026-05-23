@@ -1,0 +1,65 @@
+{
+  "id": "alert_false_positive_001",
+  "title": "Known scanner false positive",
+  "description": "A scheduled vulnerability scanner triggered a low-risk detection.",
+  "source": "mock",
+  "vendor": null,
+  "product": null,
+  "device_type": "mock",
+  "severity": "low",
+  "category": "false_positive",
+  "status": "new",
+  "entities": {
+    "src_ip": "192.0.2.20",
+    "dst_host": "test-web-01",
+    "scanner": "internal-vuln-scan"
+  },
+  "time_range": {
+    "start": "2026-05-22T14:50:00Z",
+    "end": "2026-05-22T15:10:00Z"
+  },
+  "raw": {
+    "sample": "low_risk_false_positive",
+    "vendor": "Nessus",
+    "product": "Vulnerability Scanner",
+    "detection_type": "scheduled_scan",
+    "scan_name": "Weekly Internal Scan - Q2",
+    "scan_policy": "Basic Network Scan",
+    "scan_version": "8.0.0",
+    "plugin_id": 104743,
+    "plugin_name": "HTTP TRACE / TRACK Methods",
+    "additional_plugin_ids": [
+      11936,
+      10180,
+      11011
+    ],
+    "severity": "info",
+    "matched_hosts": [
+      "test-web-01",
+      "dev-api-01",
+      "staging-web-02"
+    ],
+    "host_count": 3,
+    "uris_scanned": [
+      "/etc/passwd",
+      "/admin",
+      "/phpmyadmin",
+      "/.env",
+      "/wp-admin",
+      "/debug",
+      "/test",
+      "/config.php",
+      "/backup",
+      "/.git/config"
+    ],
+    "all_responses_404_or_403": true,
+    "no_exploitation_detected": true,
+    "total_requests": 50,
+    "scan_duration_minutes": 20,
+    "schedule_owner": "security-team",
+    "schedule_frequency": "weekly",
+    "exception_approved": true,
+    "ticket_reference": "SEC-2026-0421"
+  },
+  "created_at": "2026-05-22T15:00:00Z"
+}
