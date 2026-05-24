@@ -236,9 +236,10 @@ body {
 .dark .bg-\[\#FCF5EE\],
 .dark .bg-\[\#FCF5EE\]\/40,
 .dark .bg-\[\#FCF5EE\]\/50,
+.dark .bg-\[\#FFF2EE\],
 .dark .hover\:bg-\[\#FCF1EE\]:hover {
-  background-color: rgba(226, 88, 62, 0.12) !important;
-  border-color: rgba(226, 88, 62, 0.25) !important;
+  background-color: rgba(226, 88, 62, 0.09) !important;
+  border-color: rgba(226, 88, 62, 0.18) !important;
 }
 .dark .text-\[\#B83C25\],
 .dark .hover\:text-\[\#B83C25\]:hover {
@@ -247,9 +248,10 @@ body {
 
 /* 统一适配中危黄色/橙色 Badge 与文字 */
 .dark .bg-\[\#FAF5E6\],
+.dark .bg-\[\#FFFBEB\],
 .dark .hover\:bg-\[\#FAF5E6\]:hover {
-  background-color: rgba(214, 158, 46, 0.12) !important;
-  border-color: rgba(214, 158, 46, 0.25) !important;
+  background-color: rgba(214, 158, 46, 0.09) !important;
+  border-color: rgba(214, 158, 46, 0.18) !important;
 }
 .dark .text-\[\#A37110\],
 .dark .hover\:text-\[\#A37110\]:hover {
@@ -258,9 +260,10 @@ body {
 
 /* 统一适配低危绿色/安全 Badge 与文字 */
 .dark .bg-\[\#F0F6F1\],
+.dark .bg-\[\#F7FAFC\],
 .dark .hover\:bg-\[\#F0F6F1\]:hover {
-  background-color: rgba(16, 185, 129, 0.12) !important;
-  border-color: rgba(16, 185, 129, 0.25) !important;
+  background-color: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(16, 185, 129, 0.16) !important;
 }
 .dark .text-\[\#25633A\],
 .dark .hover\:text-\[\#25633A\]:hover {
@@ -364,4 +367,309 @@ body {
 .radar-line {
   transform-origin: 50% 50%;
   animation: radar-sweep 4s infinite linear;
+}
+
+/* SentinelPilot application shell tokens. These sit after legacy mappings so the
+   current product screens can share one light/dark/accent vocabulary. */
+:root {
+  --sidebar-width: 256px;
+  --sp-bg: oklch(0.975 0.012 82);
+  --sp-surface: oklch(0.992 0.006 82);
+  --sp-surface-soft: oklch(0.955 0.014 82);
+  --sp-sidebar: oklch(0.946 0.018 82);
+  --sp-text: oklch(0.23 0.018 255);
+  --sp-muted-text: oklch(0.49 0.026 255);
+  --sp-border: oklch(0.885 0.018 82);
+  --sp-border-strong: oklch(0.77 0.04 260);
+  --sp-hover: oklch(0.925 0.026 285);
+  --sp-selected: oklch(0.90 0.052 285);
+  --sp-accent: oklch(0.61 0.21 292);
+  --sp-accent-soft: oklch(0.93 0.045 292);
+  --sp-accent-strong: oklch(0.50 0.20 292);
+  --sp-success: oklch(0.62 0.16 158);
+  --sp-success-soft: oklch(0.93 0.045 158);
+  --sp-warning: oklch(0.72 0.15 72);
+  --sp-warning-soft: oklch(0.94 0.055 72);
+  --sp-danger: oklch(0.61 0.19 28);
+  --sp-danger-soft: oklch(0.93 0.05 28);
+}
+
+:root[data-theme="azure"] {
+  --sp-accent: oklch(0.66 0.18 244);
+  --sp-accent-soft: oklch(0.93 0.05 244);
+  --sp-accent-strong: oklch(0.52 0.17 244);
+  --sp-hover: oklch(0.925 0.026 244);
+  --sp-selected: oklch(0.90 0.052 244);
+}
+
+:root[data-theme="jade"] {
+  --sp-accent: oklch(0.64 0.14 165);
+  --sp-accent-soft: oklch(0.93 0.045 165);
+  --sp-accent-strong: oklch(0.47 0.13 165);
+  --sp-hover: oklch(0.925 0.026 165);
+  --sp-selected: oklch(0.90 0.052 165);
+}
+
+:root[data-theme="ember"] {
+  --sp-accent: oklch(0.62 0.17 35);
+  --sp-accent-soft: oklch(0.93 0.045 35);
+  --sp-accent-strong: oklch(0.50 0.16 35);
+  --sp-hover: oklch(0.925 0.026 35);
+  --sp-selected: oklch(0.90 0.052 35);
+}
+
+:root.dark {
+  --sp-bg: oklch(0.155 0.030 263);
+  --sp-surface: oklch(0.205 0.032 263);
+  --sp-surface-soft: oklch(0.245 0.034 263);
+  --sp-sidebar: oklch(0.125 0.032 263);
+  --sp-text: oklch(0.88 0.018 80);
+  --sp-muted-text: oklch(0.70 0.026 82);
+  --sp-border: oklch(0.225 0.018 263);
+  --sp-border-strong: oklch(0.285 0.026 263);
+  --sp-hover: oklch(0.30 0.05 285);
+  --sp-selected: oklch(0.33 0.07 285);
+  --sp-accent: oklch(0.73 0.18 292);
+  --sp-accent-soft: oklch(0.30 0.07 292);
+  --sp-accent-strong: oklch(0.80 0.18 292);
+  --sp-success: oklch(0.76 0.15 158);
+  --sp-success-soft: oklch(0.29 0.06 158);
+  --sp-warning: oklch(0.80 0.13 72);
+  --sp-warning-soft: oklch(0.31 0.06 72);
+  --sp-danger: oklch(0.72 0.16 28);
+  --sp-danger-soft: oklch(0.31 0.06 28);
+}
+
+:root.dark[data-theme="azure"] {
+  --sp-accent: oklch(0.75 0.15 244);
+  --sp-accent-soft: oklch(0.30 0.07 244);
+  --sp-accent-strong: oklch(0.82 0.15 244);
+  --sp-hover: oklch(0.30 0.05 244);
+  --sp-selected: oklch(0.33 0.07 244);
+}
+
+:root.dark[data-theme="jade"] {
+  --sp-accent: oklch(0.76 0.13 165);
+  --sp-accent-soft: oklch(0.30 0.06 165);
+  --sp-accent-strong: oklch(0.83 0.13 165);
+  --sp-hover: oklch(0.30 0.05 165);
+  --sp-selected: oklch(0.33 0.065 165);
+}
+
+:root.dark[data-theme="ember"] {
+  --sp-accent: oklch(0.74 0.15 35);
+  --sp-accent-soft: oklch(0.31 0.06 35);
+  --sp-accent-strong: oklch(0.82 0.15 35);
+  --sp-hover: oklch(0.30 0.05 35);
+  --sp-selected: oklch(0.33 0.065 35);
+}
+
+body {
+  background: var(--sp-bg);
+  color: var(--sp-text);
+}
+
+.sp-page {
+  background: var(--sp-bg);
+  color: var(--sp-text);
+}
+
+.sp-panel {
+  background: var(--sp-surface);
+  border: 1px solid var(--sp-border);
+  border-radius: 8px;
+}
+
+.sp-panel-muted {
+  background: var(--sp-surface-soft);
+  border: 1px solid var(--sp-border);
+  border-radius: 8px;
+}
+
+.sp-sidebar {
+  background: var(--sp-sidebar);
+  border-color: var(--sp-border);
+  color: var(--sp-text);
+}
+
+.sp-nav-item {
+  color: var(--sp-muted-text);
+}
+
+.sp-nav-item:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.sp-nav-item-active {
+  background: var(--sp-selected);
+  color: var(--sp-accent-strong);
+}
+
+.sp-hoverable:hover,
+.sp-row-hover:hover {
+  background: var(--sp-hover);
+}
+
+.sp-text {
+  color: var(--sp-text);
+}
+
+.sp-muted {
+  color: var(--sp-muted-text);
+}
+
+.sp-accent {
+  color: var(--sp-accent);
+}
+
+.sp-primary-button {
+  background: var(--sp-accent);
+  color: oklch(0.985 0.01 82);
+}
+
+.sp-primary-button:hover {
+  background: var(--sp-accent-strong);
+}
+
+.sp-status-online {
+  background: var(--sp-success-soft);
+  color: var(--sp-success);
+  border-color: color-mix(in oklch, var(--sp-success), transparent 65%);
+}
+
+.sp-status-disabled {
+  background: var(--sp-surface-soft);
+  color: var(--sp-muted-text);
+  border-color: var(--sp-border);
+}
+
+.sp-status-warning {
+  background: var(--sp-warning-soft);
+  color: var(--sp-warning);
+  border-color: color-mix(in oklch, var(--sp-warning), transparent 65%);
+}
+
+/* Legacy hard-coded Tailwind compatibility while pages migrate to semantic classes. */
+.dark .bg-\[\#FCFAF6\],
+.dark .bg-\[\#F7F5EF\],
+.dark .bg-\[\#F5F3EB\],
+.dark .bg-\[\#F5F3EB\]\/60,
+.dark .bg-\[\#FAF9F5\],
+.dark .bg-\[\#FBF8F0\],
+.dark .bg-\[\#FAFAF8\],
+.dark .hover\:bg-\[\#FAF9F5\]:hover,
+.dark .hover\:bg-\[\#F5F3EB\]:hover,
+.dark .hover\:bg-\[\#F0EDE4\]:hover {
+  background-color: var(--sp-surface-soft) !important;
+}
+
+.dark .bg-white {
+  background-color: var(--sp-surface) !important;
+}
+
+.dark .border-\[\#EAE9E4\],
+.dark .border-b-\[\#EAE9E4\],
+.dark .border-t-\[\#EAE9E4\],
+.dark .border-r-\[\#EAE9E4\],
+.dark .border-l-\[\#EAE9E4\],
+.dark .divide-\[\#EAE9E4\] > :not([hidden]) ~ :not([hidden]),
+.dark .divide-\[\#F0EDE8\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--sp-border) !important;
+}
+
+:root.dark .divide-y > :not([hidden]):not(:last-child) {
+  border-color: var(--sp-border) !important;
+}
+
+.dark .border-\[\#EAE9E4\]\/40,
+.dark .border-\[\#EAE9E4\]\/60,
+.dark .border-\[\#EAE9E4\]\/70,
+.dark .border-b-\[\#EAE9E4\]\/40,
+.dark .border-b-\[\#EAE9E4\]\/60,
+.dark .border-t-\[\#EAE9E4\]\/60,
+.dark .border-\[\#EAE6DE\]\/70,
+.dark .border-\[\#E1DEC9\],
+.dark .border-\[\#F3EBE1\],
+.dark .border-\[\#E2E8F0\],
+.dark .border-\[\#FADCD5\],
+.dark .border-\[\#FFE2D9\],
+.dark .border-\[\#FEF3C7\] {
+  border-color: var(--sp-border) !important;
+}
+
+:root.dark .divide-y > :not([hidden]) ~ :not([hidden]),
+:root.dark table,
+:root.dark thead tr,
+:root.dark tbody tr {
+  border-color: var(--sp-border) !important;
+}
+
+.dark .text-\[\#1E2022\],
+.dark .text-\[\#2A2B2D\],
+.dark .text-\[\#4A4B4D\],
+.dark .text-stone-800,
+.dark .text-stone-700,
+.dark .hover\:text-\[\#1E2022\]:hover {
+  color: var(--sp-text) !important;
+}
+
+.dark .text-\[\#6B6D70\],
+.dark .text-\[\#8C8E91\],
+.dark .text-\[\#5C5E61\],
+.dark .text-\[\#718096\],
+.dark .text-stone-600,
+.dark .text-stone-500,
+.dark .text-stone-400 {
+  color: var(--sp-muted-text) !important;
+}
+
+.dark svg.text-stone-700,
+.dark svg.text-stone-600,
+.dark svg.text-stone-500,
+.dark svg.text-stone-400,
+.dark svg.text-\[\#6B6D70\],
+.dark svg.text-\[\#718096\] {
+  color: var(--sp-muted-text) !important;
+}
+
+.dark .text-\[\#C2593F\],
+.dark .hover\:text-\[\#C2593F\]:hover {
+  color: var(--sp-accent) !important;
+}
+
+.dark .bg-\[\#C2593F\] {
+  background-color: var(--sp-accent) !important;
+}
+
+:root.dark input,
+:root.dark select,
+:root.dark textarea {
+  background-color: var(--sp-surface) !important;
+  border-color: var(--sp-border) !important;
+  color: var(--sp-text) !important;
+  caret-color: var(--sp-accent);
+  color-scheme: dark;
+}
+
+:root.dark input::placeholder,
+:root.dark textarea::placeholder {
+  color: var(--sp-muted-text) !important;
+  opacity: 0.82;
+}
+
+:root.dark option {
+  background-color: var(--sp-surface) !important;
+  color: var(--sp-text) !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--sp-accent) !important;
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--sp-accent), transparent 78%) !important;
+  outline: none !important;
 }

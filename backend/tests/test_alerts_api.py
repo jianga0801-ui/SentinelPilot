@@ -11,7 +11,7 @@ def test_list_alerts_returns_sample_alerts():
 
     assert response.status_code == 200
     body = response.json()
-    assert len(body["items"]) == 6
+    assert len(body["items"]) >= 200
     first = body["items"][0]
     assert first == {
         "id": "alert_bruteforce_001",
@@ -25,6 +25,7 @@ def test_list_alerts_returns_sample_alerts():
         "created_at": "2026-05-22T10:00:00Z",
         "status": "new",
     }
+    assert any(item["id"] == "alert_sample_001" for item in body["items"])
 
 
 def test_get_alert_returns_normalized_detail():

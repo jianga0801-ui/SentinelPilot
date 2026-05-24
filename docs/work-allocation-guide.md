@@ -296,17 +296,16 @@
 
 - 熟悉 HTTP 回调、安全签名、第三方 IM 集成的开发者
 
-### 2.12 Docker 和发布文档
+### 2.12 本地部署和发布文档
 
 范围：
 
-- Dockerfile
-- `docker-compose.yml`
 - README
 - 架构文档
 - API 文档
 - Eval 报告文档
 - 发布前安全检查
+- 纯本地启动命令
 
 输入：
 
@@ -314,13 +313,41 @@
 
 输出：
 
-- 一键启动
+- 本地一键启动说明
 - 完整 README
 - 发布检查通过
 
 适合分配给：
 
-- 熟悉工程交付、Docker、技术文档整理的开发者
+- 熟悉工程交付、本地部署、技术文档整理的开发者
+
+### 2.13 桌面应用打包
+
+范围：
+
+- Next.js 静态导出适配
+- 前端动态 API Base URL
+- FastAPI sidecar 启动入口
+- 用户数据目录重定向
+- Tauri 主进程、sidecar 生命周期和安装包配置
+- Windows / Linux 构建脚本
+
+输入：
+
+- 主开发文档：Desktop Runtime Responsibilities、Finalize Desktop Packaging and Release Docs
+- `docs/desktop-packaging.md`
+
+输出：
+
+- `frontend/src-tauri/`
+- `backend/sentinel_pilot/desktop_runtime.py`
+- `scripts/build-desktop.ps1`
+- `scripts/build-desktop.sh`
+- 桌面构建与生命周期验证记录
+
+适合分配给：
+
+- 熟悉桌面壳、构建工具链、进程管理和跨平台发布的开发者
 
 ---
 
@@ -349,13 +376,14 @@
 ```text
 9. Eval Runner
 10. 前端工作台
-11. Docker 和发布文档
+11. 本地部署和发布文档
+12. 桌面应用打包
 ```
 
 ### 第四批：增强项
 
 ```text
-12. 钉钉互动卡片与通知（对应工作包 2.11）
+13. 钉钉互动卡片与通知（对应工作包 2.11）
 ```
 
 ---
@@ -367,7 +395,8 @@
 - 后端基础工程 与 安全告警样例数据
 - 前端工作台 与 后端 API 实现，但前端 mock 字段必须与 API Contract 一致
 - Eval Runner 与 Agent 工具系统，但需要先固定 eval case 格式
-- Docker 配置 与 后端功能开发，但需要启动命令相对稳定
+- 本地启动脚本 与 后端功能开发，但需要启动命令相对稳定
+- 桌面打包脚本 与 前端视觉收口，但必须先固定 API Base URL 机制
 
 不建议并行：
 

@@ -1,62 +1,144 @@
 # API Contract
 
-The SentinelPilot backend provides a RESTful API. Below are the key endpoints used by the frontend and external integrations. For interactive documentation, visit `/docs` on the backend server.
+The backend exposes local REST APIs under `/api`. Interactive OpenAPI documentation is available at `/docs` when the backend is running.
 
-## 1. Alerts
+The desktop sidecar also exposes `GET /health` at the service root so the Tauri main process can verify that the dynamically assigned backend port is ready.
+
+## Health
+
+### `GET /health`
+
+Returns the local backend health status.
+
+## Alerts
 
 ### `GET /api/alerts`
-Retrieves a list of all normalized alerts available from the current security device adapter.
+
+Returns normalized alert list items from the current alert source. The local source includes the canonical examples plus deterministic expanded samples.
 
 ### `GET /api/alerts/{alert_id}`
-Retrieves detailed information for a specific alert, including its original raw payload and normalized entities.
 
-## 2. Investigations
+Returns one normalized alert with raw payload and entities.
+
+## Investigations
 
 ### `POST /api/investigations`
-Creates a new investigation for a given `alert_id`.
-- **Payload**: `{"alert_id": "string"}`
-- **Returns**: `{"id": "inv_123", "status": "created", ...}`
+
+Payload:
+
+```json
+{"alert_id": "alert_bruteforce_001"}
+```
+
+Creates an investigation in `created` state.
 
 ### `POST /api/investigations/{investigation_id}/run`
-Triggers the Orchestrator to begin asynchronous processing.
-- **Returns**: `{"id": "inv_123", "status": "running"}`
+
+Starts the deterministic orchestrator in the background.
 
 ### `GET /api/investigations/{investigation_id}`
-Retrieves the current state, dynamic severity, and category of the investigation. Polled by the frontend to detect state transitions (e.g., entering `waiting_approval`).
+
+Returns the current investigation state, severity, category, MITRE techniques, and error summary if failed.
 
 ### `GET /api/investigations/{investigation_id}/timeline`
-Retrieves the immutable chronological ledger of steps, tool executions, and findings generated during the investigation.
 
-## 3. Approvals
+Returns the append-only investigation timeline.
+
+## Approvals
 
 ### `GET /api/investigations/{investigation_id}/approvals`
-Lists all approval requests generated for the investigation.
+
+Lists approval records for an investigation.
 
 ### `POST /api/approvals/{approval_id}/decision`
-Submits a human SOC decision (approve or reject) for a pending high-risk action.
-- **Payload**: `{"decision": "approved", "comment": "Verified IP address is malicious."}`
 
-## 4. Reports
+Payload:
+
+```json
+{"decision": "approved", "comment": "Verified malicious source."}
+```
+
+Records a human decision. The API does not execute real response actions.
+
+## Reports
 
 ### `GET /api/investigations/{investigation_id}/report`
-Retrieves the final finalized Markdown incident report. This endpoint returns an error if the investigation has not reached the `completed` state.
 
-## 5. Evals
+Returns or creates the Markdown incident report for a completed investigation.
 
-### `POST /api/evals/run`
-Executes the automated Eval Runner against the baseline dataset.
-- **Returns**: `{"run_id": "eval_123", ...}`
+## Settings
 
-### `GET /api/evals/{run_id}`
-Retrieves the grading results of a specific evaluation run, including detailed scorecards for severity match, MITRE match, and tool execution.
+### `GET /api/settings`
 
-## 6. IM Integrations
+Returns editable runtime configuration. Sensitive values return `value: null` plus `configured`.
+
+### `PATCH /api/settings`
+
+Payload:
+
+```json
+{
+  "items": {
+    "im_provider": "feishu",
+    "feishu_webhook_url": "https://open.feishu.cn/open-apis/bot/v2/hook/..."
+  }
+}
+```
+
+Updates allowed local settings, reloads runtime dependencies, and returns the same masked response shape.
+
+### `GET /api/settings/status`
+
+Returns editable and sensitive key metadata.
+
+## Logs And Dashboard
+
+### `GET /api/logs/security`
+
+Filters local JSONL security telemetry. Supported filters:
+
+- `alert_id`
+- `host`
+- `username`
+- `src_ip`
+- `event_type`
+- `severity`
+- `start_time`
+- `end_time`
+- `limit`
+
+### `GET /api/system/dashboard`
+
+Returns health state, alert metrics, investigation counts, pending approvals, recent timeline items, and high-risk alerts.
+
+### `GET /api/system/health`
+
+Returns backend, database, LLM, and notification-channel status.
+
+### `GET /api/system/logs/service`
+
+Reads local service logs when `logs/app.log` exists. Missing files return an empty list.
+
+## IM Integrations
 
 ### `GET /api/integrations/im/status`
-Returns the configured IM provider and capability flags, including whether DingTalk interactive cards and callbacks are enabled.
+
+Returns provider status for DingTalk, Feishu, or WeCom.
 
 ### `POST /api/integrations/im/test`
-Attempts to send a test notification through the configured provider. Disabled or incomplete configuration must not break the application.
+
+Attempts to send a robot notification when enabled and configured.
 
 ### `POST /api/integrations/im/dingtalk/card-callback`
-Receives DingTalk interactive card button callbacks. The backend validates DingTalk callback signature headers and records the approval decision through the same approval workflow used by the frontend.
+
+Receives DingTalk interactive card decisions, validates callback signature headers, and records the approval decision.
+
+## Evals
+
+### `POST /api/evals/run`
+
+Runs the baseline deterministic evaluation suite.
+
+### `GET /api/evals/{run_id}`
+
+Returns one evaluation run result.

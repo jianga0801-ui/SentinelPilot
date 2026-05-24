@@ -17,10 +17,10 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className="h-full antialiased">
       <body className="min-h-full flex text-foreground bg-background overflow-y-auto font-sans transition-colors duration-200">
-        <LanguageProvider>
+        <LanguageProvider initialLanguage="zh">
           <ThemeProvider>
             <Sidebar />
-            <main className="flex-1 min-h-screen pl-64 flex flex-col relative z-10">
+            <main className="flex-1 min-h-screen pl-[var(--sidebar-width,16rem)] flex flex-col relative z-10 transition-[padding] duration-200">
               {children}
             </main>
           </ThemeProvider>

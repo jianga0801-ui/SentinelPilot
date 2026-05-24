@@ -97,6 +97,31 @@ class InvestigationRepository:
             updated_at=row["updated_at"],
         )
 
+    def list_recent(self, limit: int = 100) -> list[Investigation]:
+        rows = self.connection.execute(
+            """
+            SELECT * FROM investigations
+            ORDER BY updated_at DESC, created_at DESC, id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+        return [
+            Investigation(
+                id=row["id"],
+                alert_id=row["alert_id"],
+                status=row["status"],
+                summary=row["summary"],
+                severity=row["severity"],
+                category=row["category"],
+                mitre_techniques=json.loads(row["mitre_techniques"]),
+                error_message=row["error_message"],
+                created_at=row["created_at"],
+                updated_at=row["updated_at"],
+            )
+            for row in rows
+        ]
+
     def update_analysis(
         self,
         investigation_id: str,
@@ -330,21 +355,32 @@ class ApprovalRepository:
             "SELECT * FROM approvals WHERE investigation_id = ? ORDER BY created_at ASC, id ASC",
             (investigation_id,),
         ).fetchall()
-        return [
-            Approval(
-                id=row["id"],
-                investigation_id=row["investigation_id"],
-                action_type=row["action_type"],
-                target=row["target"],
-                risk_level=row["risk_level"],
-                reason=row["reason"],
-                status=row["status"],
-                comment=row["comment"],
-                created_at=row["created_at"],
-                decided_at=row["decided_at"],
-            )
-            for row in rows
-        ]
+        return [self._from_row(row) for row in rows]
+
+    def list_recent(self, limit: int = 100) -> list[Approval]:
+        rows = self.connection.execute(
+            """
+            SELECT * FROM approvals
+            ORDER BY created_at DESC, id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+        return [self._from_row(row) for row in rows]
+
+    def _from_row(self, row: sqlite3.Row) -> Approval:
+        return Approval(
+            id=row["id"],
+            investigation_id=row["investigation_id"],
+            action_type=row["action_type"],
+            target=row["target"],
+            risk_level=row["risk_level"],
+            reason=row["reason"],
+            status=row["status"],
+            comment=row["comment"],
+            created_at=row["created_at"],
+            decided_at=row["decided_at"],
+        )
 
 
 class ReportRepository:
@@ -389,3 +425,60 @@ class ReportRepository:
             content=row["content"],
             created_at=row["created_at"],
         )
+
+
+SENSITIVE_CONFIG_KEYS = {
+    "llm_api_key",
+    "dingtalk_webhook_url",
+    "dingtalk_secret",
+    "dingtalk_client_secret",
+    "dingtalk_card_callback_secret",
+    "feishu_webhook_url",
+    "feishu_secret",
+    "wecom_webhook_url",
+    "siem_api_key",
+    "edr_api_key",
+}
+
+
+class SystemConfigRepository:
+    def __init__(self, connection: sqlite3.Connection) -> None:
+        self.connection = connection
+
+    def upsert_many(self, items: dict[str, str]) -> None:
+        now = _to_iso(_utc_now())
+        for key, value in items.items():
+            self.connection.execute(
+                """
+                INSERT INTO system_config (key, value, updated_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(key) DO UPDATE SET
+                    value = excluded.value,
+                    updated_at = excluded.updated_at
+                """,
+                (key, value, now),
+            )
+        self.connection.commit()
+
+    def list_items(self) -> list[dict[str, Any]]:
+        rows = self.connection.execute(
+            "SELECT key, value, updated_at FROM system_config ORDER BY key ASC"
+        ).fetchall()
+        return [self._public_item(row["key"], row["value"], row["updated_at"]) for row in rows]
+
+    def as_public_map(self) -> dict[str, dict[str, Any]]:
+        return {item["key"]: item for item in self.list_items()}
+
+    def raw_map(self) -> dict[str, str]:
+        rows = self.connection.execute("SELECT key, value FROM system_config").fetchall()
+        return {row["key"]: row["value"] for row in rows}
+
+    def _public_item(self, key: str, value: str, updated_at: str) -> dict[str, Any]:
+        is_sensitive = key in SENSITIVE_CONFIG_KEYS
+        return {
+            "key": key,
+            "value": None if is_sensitive else value,
+            "configured": bool(value),
+            "sensitive": is_sensitive,
+            "updated_at": updated_at,
+        }

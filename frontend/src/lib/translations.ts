@@ -31,8 +31,8 @@ export function translateFrom(
 export const translations = {
   sidebar: {
     workspace: {
-      zh: '工作空间',
-      en: 'WORKSPACE'
+      zh: '导航',
+      en: 'NAVIGATION'
     },
     alertInbox: {
       zh: '安全告警收件箱',
@@ -134,8 +134,8 @@ export const translations = {
 
   alerts: {
     breadcrumbHome: {
-      zh: '工作空间',
-      en: 'Workspace'
+      zh: '运行总览',
+      en: 'Dashboard'
     },
     breadcrumbList: {
       zh: '安全告警台账',
@@ -216,8 +216,8 @@ export const translations = {
 
   alertDetail: {
     breadcrumbHome: {
-      zh: '工作空间',
-      en: 'Workspace'
+      zh: '运行总览',
+      en: 'Dashboard'
     },
     breadcrumbList: {
       zh: '安全告警台账',
@@ -291,8 +291,8 @@ export const translations = {
 
   investigation: {
     breadcrumbHome: {
-      zh: '工作空间',
-      en: 'Workspace'
+      zh: '运行总览',
+      en: 'Dashboard'
     },
     breadcrumbList: {
       zh: '安全告警台账',

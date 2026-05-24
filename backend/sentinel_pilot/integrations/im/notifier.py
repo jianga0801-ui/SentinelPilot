@@ -5,6 +5,7 @@ from sentinel_pilot.config import Settings
 from sentinel_pilot.core.models import Approval, Report
 from sentinel_pilot.integrations.im.base import IMProvider
 from sentinel_pilot.integrations.im.dingtalk import DingTalkProvider
+from sentinel_pilot.integrations.im.webhook import FeishuProvider, WeComProvider
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +18,8 @@ class IMNotifier:
         self.last_error: str | None = None
         self.dingtalk_card_callback_secret = settings.dingtalk_card_callback_secret
 
-        if settings.im_provider.lower() == "dingtalk":
+        provider_name = settings.im_provider.lower()
+        if provider_name == "dingtalk":
             self.provider = DingTalkProvider(
                 webhook_url=settings.dingtalk_webhook_url,
                 secret=settings.dingtalk_secret,
@@ -29,6 +31,13 @@ class IMNotifier:
                 card_callback_url=settings.dingtalk_card_callback_url,
                 card_callback_secret=settings.dingtalk_card_callback_secret,
             )
+        elif provider_name == "feishu":
+            self.provider = FeishuProvider(
+                webhook_url=settings.feishu_webhook_url,
+                secret=settings.feishu_secret,
+            )
+        elif provider_name == "wecom":
+            self.provider = WeComProvider(webhook_url=settings.wecom_webhook_url)
 
     def get_status(self) -> dict[str, Any]:
         if not self.provider:
@@ -37,6 +46,7 @@ class IMNotifier:
                 "provider": "unknown",
                 "notification_only": True,
                 "callback_enabled": False,
+                "card_enabled": False,
             }
 
         status = self.provider.get_status()

@@ -85,6 +85,10 @@ export interface InvestigationRunResponse {
   status: 'running';
 }
 
+export interface InvestigationListResponse {
+  items: Investigation[];
+}
+
 // Approval Structures
 export interface ApprovalListItem {
   id: string;
@@ -140,6 +144,85 @@ export interface LLMStatus {
   supported_action_modes: string[];
 }
 
+export interface SystemHealth {
+  backend: { status: 'online' | 'offline' | 'disabled' };
+  database: { status: 'online' | 'offline' | 'disabled' };
+  llm: { status: 'online' | 'offline' | 'disabled'; configured: boolean };
+  im: { status: 'online' | 'offline' | 'disabled'; configured: boolean };
+}
+
+export interface DashboardSummary {
+  health: SystemHealth;
+  metrics: {
+    total_alerts: number;
+    today_alerts: number;
+    high_risk_alerts: number;
+    investigations_total: number;
+    investigations_running: number;
+    investigations_waiting_approval: number;
+    investigations_completed: number;
+    pending_approvals: number;
+  };
+  recent_timeline: Array<{
+    id: string;
+    investigation_id: string;
+    type: TimelineItem['type'];
+    title: string;
+    content: string;
+    created_at: string;
+  }>;
+  recent_high_risk_alerts: Array<{
+    id: string;
+    title: string;
+    severity: AlertListItem['severity'];
+    category: string;
+    created_at: string;
+  }>;
+}
+
+export interface SecurityLogEvent {
+  id: string;
+  alert_id: string;
+  event_time: string;
+  log_type: string;
+  host?: string | null;
+  message: string;
+  src_ip?: string | null;
+  username?: string | null;
+  severity?: string | null;
+  [key: string]: JsonValue | undefined;
+}
+
+export interface SecurityLogResponse {
+  items: SecurityLogEvent[];
+  count: number;
+  total: number;
+}
+
+export interface ServiceLogEntry {
+  id: string;
+  level: string;
+  message: string;
+  created_at: string | null;
+}
+
+export interface ServiceLogResponse {
+  items: ServiceLogEntry[];
+  count: number;
+}
+
+export interface SystemConfigItem {
+  key: string;
+  value: string | null;
+  configured: boolean;
+  sensitive: boolean;
+  updated_at: string | null;
+}
+
+export interface SettingsResponse {
+  items: Record<string, SystemConfigItem>;
+}
+
 // Report Structure
 export interface Report {
   id: string;
@@ -186,10 +269,38 @@ export interface EvalRunSummary {
   created_at: string;
 }
 
-const API_BASE = '/api';
+declare global {
+  interface Window {
+    __TAURI_INTERNALS__?: unknown;
+  }
+}
+
+const ENV_API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') || '';
+let tauriBackendBaseUrl: Promise<string> | null = null;
+
+async function getBackendBaseUrl(): Promise<string> {
+  if (ENV_API_BASE) {
+    return ENV_API_BASE;
+  }
+
+  if (typeof window !== 'undefined' && window.__TAURI_INTERNALS__) {
+    tauriBackendBaseUrl ??= import('@tauri-apps/api/core')
+      .then(({ invoke }) => invoke<string>('backend_base_url'))
+      .then((url) => url.replace(/\/$/, ''));
+    return tauriBackendBaseUrl;
+  }
+
+  return '';
+}
+
+async function resolveApiUrl(path: string): Promise<string> {
+  const baseUrl = await getBackendBaseUrl();
+  const apiPath = path === '/health' ? '/health' : `/api${path}`;
+  return `${baseUrl}${apiPath}`;
+}
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const url = `${API_BASE}${path}`;
+  const url = await resolveApiUrl(path);
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -233,6 +344,12 @@ export const api = {
   },
 
   // Investigations
+  async getInvestigations(params: Record<string, string> = {}): Promise<InvestigationListResponse> {
+    const query = new URLSearchParams(params);
+    const suffix = query.toString() ? `?${query.toString()}` : '';
+    return request<InvestigationListResponse>(`/investigations${suffix}`);
+  },
+
   async createInvestigation(alertId: string): Promise<InvestigationCreateResponse> {
     return request<InvestigationCreateResponse>('/investigations', {
       method: 'POST',
@@ -255,6 +372,12 @@ export const api = {
   },
 
   // Approvals
+  async getAllApprovals(params: Record<string, string> = {}): Promise<ApprovalListResponse> {
+    const query = new URLSearchParams(params);
+    const suffix = query.toString() ? `?${query.toString()}` : '';
+    return request<ApprovalListResponse>(`/approvals${suffix}`);
+  },
+
   async getApprovals(investigationId: string): Promise<ApprovalListResponse> {
     return request<ApprovalListResponse>(`/investigations/${investigationId}/approvals`);
   },
@@ -293,5 +416,34 @@ export const api = {
 
   async getLLMStatus(): Promise<LLMStatus> {
     return request<LLMStatus>('/integrations/llm/status');
+  },
+
+  async getSystemDashboard(): Promise<DashboardSummary> {
+    return request<DashboardSummary>('/system/dashboard');
+  },
+
+  async getSystemHealth(): Promise<SystemHealth> {
+    return request<SystemHealth>('/system/health');
+  },
+
+  async getSecurityLogs(params: Record<string, string>): Promise<SecurityLogResponse> {
+    const query = new URLSearchParams(params);
+    return request<SecurityLogResponse>(`/logs/security?${query.toString()}`);
+  },
+
+  async getServiceLogs(params: Record<string, string>): Promise<ServiceLogResponse> {
+    const query = new URLSearchParams(params);
+    return request<ServiceLogResponse>(`/system/logs/service?${query.toString()}`);
+  },
+
+  async getSettings(): Promise<SettingsResponse> {
+    return request<SettingsResponse>('/settings');
+  },
+
+  async updateSettings(items: Record<string, string>): Promise<SettingsResponse> {
+    return request<SettingsResponse>('/settings', {
+      method: 'PATCH',
+      body: JSON.stringify({ items }),
+    });
   }
 };

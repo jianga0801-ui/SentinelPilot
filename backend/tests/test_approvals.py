@@ -31,6 +31,20 @@ def test_high_risk_orchestrator_run_creates_pending_approval():
     assert approvals["items"][0]["decided_at"] is None
 
 
+def test_global_approval_queue_returns_pending_approvals():
+    with TestClient(app) as client:
+        created = client.post(
+            "/api/investigations",
+            json={"alert_id": "alert_bruteforce_001"},
+        ).json()
+        client.post(f"/api/investigations/{created['id']}/run")
+        response = client.get("/api/approvals", params={"limit": 10})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert any(item["investigation_id"] == created["id"] for item in body["items"])
+
+
 def test_powershell_and_lateral_movement_runs_create_isolation_approvals():
     cases = [
         ("alert_powershell_001", "win-fin-02"),

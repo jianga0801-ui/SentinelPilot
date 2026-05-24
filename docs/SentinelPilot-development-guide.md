@@ -28,7 +28,7 @@ SentinelPilot provides these capabilities:
 - Require human approval for high-risk response actions.
 - Generate structured incident reports.
 - Evaluate severity, category, tool calls, approval triggers, and report evidence.
-- Send DingTalk interactive approval cards, with a webhook markdown fallback.
+- Send IM robot notifications through DingTalk, Feishu, or WeCom; DingTalk can also use interactive approval cards.
 - Support future integrations with mainstream security vendors in China.
 
 ## Non-goals
@@ -48,24 +48,31 @@ The initial version does not provide these capabilities:
 - Project directory: `C:\Users\14378\Documents\Code\SentinelPilot`
 - Backend: Python 3.11+, FastAPI, Pydantic v2, SQLite, pytest, Ruff.
 - Frontend: Next.js, TypeScript, Tailwind CSS.
+- Desktop packaging: Tauri 2 shell, Next.js static export, and a compiled Python FastAPI sidecar.
 - Initial model mode: rules, templates, and mock model.
 - Optional model integration: OpenAI-compatible LLM providers can be enabled by environment
   configuration, but tests and the default local workflow must keep working without a real model API.
 - Initial data source: `MockAlertSource` and offline sample logs.
-- Initial IM integration: DingTalk interactive approval cards; markdown webhook notifications remain a fallback.
+- Initial IM integration: DingTalk, Feishu, and WeCom robot notifications. DingTalk interactive approval cards remain available when card credentials are configured.
 - Initial response actions: simulated only.
 
 ## Architecture
 
 ```text
+desktop
+  Tauri main process
+  sidecar lifecycle manager
+      |
+      v
 frontend
-  Next.js app
-  API client
+  Next.js static export
+  API client with dynamic backend URL
   investigation workspace
       |
       v
 backend
   FastAPI
+  desktop runtime entrypoint
   Investigation service
   Agent orchestrator
   Tool registry
@@ -79,6 +86,8 @@ storage
   local example files
   local knowledge base
 ```
+
+The local development path can still run the backend and frontend separately. The desktop path must not require users to install Python, Node.js, or open a terminal.
 
 ### Backend Responsibilities
 
@@ -109,6 +118,23 @@ The frontend owns:
 - IM integration status display.
 
 The frontend must use backend APIs for business data.
+
+### Desktop Runtime Responsibilities
+
+The Tauri desktop shell owns:
+
+- Starting the compiled FastAPI sidecar on a free local port.
+- Providing the dynamic backend URL to the WebView.
+- Loading the static Next.js export from `frontend/out`.
+- Hiding terminal windows in release builds.
+- Stopping the sidecar process tree when the desktop window closes.
+
+The backend desktop entrypoint owns:
+
+- Accepting `--host` and `--port` command-line arguments.
+- Resolving SQLite and service-log paths to the OS user data directory.
+- Resolving packaged resource files when running from a PyInstaller bundle.
+- Allowing local development and Tauri WebView CORS origins.
 
 ## Security Device Adapter Model
 
@@ -832,6 +858,97 @@ Response:
 
 This endpoint returns a sanitized configuration view. It must not include API keys or raw secrets.
 
+### List and Update Settings
+
+```http
+GET /api/settings
+PATCH /api/settings
+GET /api/settings/status
+```
+
+Settings are stored in `system_config`. `.env` remains the bootstrap source for database and
+initial local defaults. Sensitive keys such as LLM API keys and IM robot secrets are never returned
+as plaintext; responses expose only `configured: true/false`. Updating settings rebuilds the runtime
+LLM client, IM notifier, and dependent service references.
+
+Patch request:
+
+```json
+{
+  "items": {
+    "llm_provider": "openai_compatible",
+    "llm_model": "security-model",
+    "llm_api_key": "secret-value"
+  }
+}
+```
+
+Response:
+
+```json
+{
+  "items": {
+    "llm_model": {
+      "key": "llm_model",
+      "value": "security-model",
+      "configured": true,
+      "sensitive": false,
+      "updated_at": "2026-05-24T08:00:00Z"
+    },
+    "llm_api_key": {
+      "key": "llm_api_key",
+      "value": null,
+      "configured": true,
+      "sensitive": true,
+      "updated_at": "2026-05-24T08:00:00Z"
+    }
+  }
+}
+```
+
+### Search Security Logs
+
+```http
+GET /api/logs/security?alert_id=alert_bruteforce_001&limit=100
+```
+
+This endpoint searches the local sample JSONL telemetry under `examples/logs/events.jsonl`.
+Supported filters are `alert_id`, `host`, `username`, `src_ip`, `event_type`, `severity`,
+`start_time`, `end_time`, and `limit`.
+
+Response:
+
+```json
+{
+  "items": [
+    {
+      "id": "evt_0001",
+      "alert_id": "alert_bruteforce_001",
+      "event_time": "2026-05-22T09:50:02Z",
+      "log_type": "auth",
+      "host": "linux-web-01",
+      "message": "Failed password for admin from 203.0.113.10 port 37296 ssh2",
+      "src_ip": "203.0.113.10",
+      "username": "admin"
+    }
+  ],
+  "count": 1,
+  "total": 1
+}
+```
+
+### System Dashboard and Service Logs
+
+```http
+GET /api/system/dashboard
+GET /api/system/health
+GET /api/system/logs/service?level=ERROR&limit=100
+```
+
+The dashboard endpoint aggregates alert counts, investigation status counts, pending approvals,
+integration health, recent timeline events, and recent high-risk alerts. Service logs are read from
+`logs/app.log` when present; missing log files return an empty list.
+
 ### Send a Test IM Notification
 
 ```http
@@ -895,7 +1012,6 @@ sentinel-pilot/
   LICENSE
   .gitignore
   .env.example
-  docker-compose.yml
   backend/
     pyproject.toml
     sentinel_pilot/
@@ -908,6 +1024,9 @@ sentinel-pilot/
         routes_approvals.py
         routes_evals.py
         routes_integrations.py
+        routes_logs.py
+        routes_settings.py
+        routes_system.py
         schemas.py
       core/
         models.py
@@ -917,6 +1036,7 @@ sentinel-pilot/
         investigation_service.py
         approval_service.py
         report_service.py
+        log_service.py
         trace_service.py
       agent/
         orchestrator.py
@@ -1346,15 +1466,16 @@ Verify:
 - Users can approve or reject high-risk actions.
 - Users can read the final report.
 - Users can run evals.
-- Users can see whether DingTalk notifications are enabled.
+- Users can see whether the configured notification channel is enabled.
 
-### Step 13: Implement DingTalk Notifications
+### Step 13: Implement IM Robot Notifications
 
 Create:
 
 ```text
 backend/sentinel_pilot/integrations/im/base.py
 backend/sentinel_pilot/integrations/im/dingtalk.py
+backend/sentinel_pilot/integrations/im/webhook.py
 backend/sentinel_pilot/integrations/im/notifier.py
 backend/sentinel_pilot/api/routes_integrations.py
 backend/tests/test_im_notifier.py
@@ -1366,11 +1487,14 @@ Configuration:
 IM_PROVIDER=dingtalk
 IM_NOTIFICATION_ENABLED=false
 
-# Optional webhook fallback.
+# Robot notification channels. Pick one: dingtalk, feishu, or wecom.
 DINGTALK_WEBHOOK_URL=
 DINGTALK_SECRET=
+FEISHU_WEBHOOK_URL=
+FEISHU_SECRET=
+WECOM_WEBHOOK_URL=
 
-# Interactive card approval.
+# DingTalk interactive card approval.
 DINGTALK_CLIENT_ID=
 DINGTALK_CLIENT_SECRET=
 DINGTALK_ROBOT_CODE=
@@ -1394,44 +1518,61 @@ LLM_ACTION_MODE=approval_required
 LLM_ALLOW_HIGH_RISK_ACTIONS=true
 ```
 
-`PUBLIC_APP_URL` is the frontend base URL used in DingTalk messages. Notification links should point to investigation pages, approval panels, or reports under this URL.
+`PUBLIC_APP_URL` is the frontend base URL used in robot messages. Notification links should point to investigation pages, approval panels, or reports under this URL.
 Real DingTalk button callbacks require `DINGTALK_CARD_CALLBACK_URL` to be reachable by DingTalk.
 
 Verify:
 
 - Missing webhook config does not fail the app.
 - The test endpoint sends a message when webhook config is present.
-- Approval creation sends an interactive card when card config is present.
+- Approval creation sends a DingTalk interactive card when card config is present, otherwise it uses the configured notification robot.
 - DingTalk card callback validates the callback signature and records the approval decision.
 - Investigation completion sends a summary.
 
-### Step 14: Add Docker and Release Docs
+### Step 14: Finalize Desktop Packaging and Release Docs
 
-Create:
+Create or update:
 
 ```text
-Dockerfile
-docker-compose.yml
 README.md
 docs/architecture.md
 docs/api-contract.md
+docs/desktop-packaging.md
 docs/eval-report.md
 docs/im-integration.md
 ```
 
+Desktop packaging requirements:
+
+- `frontend/next.config.ts` must use `output: "export"`.
+- The frontend API client must use `NEXT_PUBLIC_API_BASE_URL` in local development and `backend_base_url` in Tauri.
+- Detail pages that need runtime IDs must use static-export-safe query routes.
+- `python -m sentinel_pilot --host 127.0.0.1 --port <port>` must start the backend on the supplied port.
+- The packaged backend must write SQLite and service logs to the user data directory, not the installation directory.
+- Tauri must launch the backend as a sidecar and clean up the process tree on exit.
+
 Verify:
 
 ```powershell
-docker compose up
+cd backend
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\ruff.exe check .
+
+cd ..\frontend
+npm run lint
+npm run build
+npm run tauri:build
 ```
 
-Then open:
+Then verify local development endpoints:
 
 ```text
 http://localhost:3000
 http://localhost:8000/health
 http://localhost:8000/docs
 ```
+
+Also verify the packaged desktop executable opens without a console window and shuts down the backend sidecar when the main window closes.
 
 ## Enterprise Rollout
 
@@ -1449,7 +1590,7 @@ Scope:
 - Deterministic orchestrator
 - Local frontend
 - Eval runner
-- DingTalk interactive approval cards, with notification-only fallback
+- DingTalk, Feishu, and WeCom robot notifications; DingTalk supports interactive approval cards with notification-only fallback
 
 Exit criteria:
 

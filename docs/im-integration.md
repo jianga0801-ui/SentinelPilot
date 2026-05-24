@@ -1,29 +1,25 @@
 # IM Integration
 
-SentinelPilot supports DingTalk notifications for investigation lifecycle events. The preferred mode is an interactive approval card: when a high-risk response action needs approval, DingTalk users can approve or reject from the card, and SentinelPilot records the decision through the backend approval service.
+SentinelPilot supports local configuration for three robot notification channels:
 
-Webhook markdown messages remain available as a fallback for environments that do not have DingTalk interactive card delivery configured.
+- DingTalk robot webhook
+- Feishu custom bot webhook
+- WeCom group robot webhook
 
-## Supported Events
-
-- Approval required: sends an interactive DingTalk card when card configuration is complete, otherwise falls back to a markdown webhook message.
-- Card approval callback: records `approved` or `rejected` decisions after validating the DingTalk callback signature.
-- Investigation completed: sends a markdown summary when notification is enabled and webhook configuration is present.
-- Test notification: exposes an API endpoint for checking provider configuration without requiring a live investigation.
+DingTalk additionally supports interactive approval cards. Feishu and WeCom currently operate as notification-only robot channels.
 
 ## Configuration
 
-Keep real values in local `.env`, the deployment environment, or a secret manager. Do not commit them.
-
 ```env
 IM_PROVIDER=dingtalk
-IM_NOTIFICATION_ENABLED=true
+IM_NOTIFICATION_ENABLED=false
 
-# Optional webhook fallback.
 DINGTALK_WEBHOOK_URL=
 DINGTALK_SECRET=
+FEISHU_WEBHOOK_URL=
+FEISHU_SECRET=
+WECOM_WEBHOOK_URL=
 
-# Interactive card approval.
 DINGTALK_CLIENT_ID=
 DINGTALK_CLIENT_SECRET=
 DINGTALK_ROBOT_CODE=
@@ -35,17 +31,23 @@ DINGTALK_CARD_CALLBACK_SECRET=
 PUBLIC_APP_URL=http://localhost:3000
 ```
 
-`DINGTALK_CARD_CALLBACK_URL` must be reachable by DingTalk for real button clicks. Local development can still run the callback endpoint and signature tests without sending a live card.
+Runtime settings can also be edited from the Settings Center. Secret values are stored locally and are never returned to the frontend as plaintext.
 
-## Backend Endpoints
+## Provider Behavior
+
+- DingTalk: markdown webhook fallback, optional signature, optional interactive approval card.
+- Feishu: interactive-card style robot message, optional bot signature.
+- WeCom: markdown group robot message.
+
+If notification is disabled or a webhook is missing, business workflows still continue. Notification failure must not block investigation completion or approval creation.
+
+## DingTalk Card Callback
 
 ```http
-GET /api/integrations/im/status
-POST /api/integrations/im/test
 POST /api/integrations/im/dingtalk/card-callback
 ```
 
-The callback endpoint expects DingTalk HTTP callback headers:
+The callback endpoint validates DingTalk callback headers:
 
 ```text
 x-ddpaas-signature-timestamp
@@ -54,27 +56,13 @@ x-ddpaas-signature
 
 SentinelPilot calculates `base64(hmac_sha256(DINGTALK_CARD_CALLBACK_SECRET, timestamp))` and rejects invalid callbacks with `401`.
 
-## DingTalk Card Params
-
-The card template should send these params when users click approval buttons:
-
-```json
-{
-  "approval_id": "appr_001",
-  "decision": "approved"
-}
-```
-
-Use `decision: "rejected"` for rejection.
-
 ## Verification
 
-Default verification does not require real DingTalk credentials:
+Default verification does not require real IM credentials:
 
 ```powershell
 cd backend
 .\.venv\Scripts\python.exe -m pytest tests\test_im_notifier.py -q
-.\.venv\Scripts\ruff.exe check .
 ```
 
-Live DingTalk delivery should be tested later with a real conversation ID, robot code, published card template, and public callback URL.
+Live robot delivery should be tested later with real webhook values in local `.env`.

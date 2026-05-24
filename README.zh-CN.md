@@ -2,60 +2,79 @@
 
 # SentinelPilot
 
-SentinelPilot 是一个自动化的安全告警响应与调查 Agent 平台。它接收来自各类安全设备的告警，将其标准化为统一格式，利用 AI 和安全工具编排调查工作流，管理人工介入（Human-in-the-loop）审批，并生成全面的 Markdown 格式事件报告。
+SentinelPilot 是一个纯本地部署的安全告警研判工作台。它负责归一化安全告警、编排确定性研判流程、记录证据与审批、生成 Markdown 事件报告，并提供面向 SOC 场景的运行总览、日志探索和设置中心。
 
 ## 项目截图
 
-![工作台截图](./docs/assets/screenshot-dashboard.png)
+![运行总览截图](./docs/assets/screenshot-dashboard.png)
+![通知集成截图](./docs/assets/screenshot-integrations.png)
+![日志探索截图](./docs/assets/screenshot-logs.png)
+![系统设置截图](./docs/assets/screenshot-settings.png)
+![评估中心截图](./docs/assets/screenshot-evals.png)
 ![审批流程截图](./docs/assets/screenshot-approval.png)
 
-## 功能特性
+## 当前能力
 
-- **告警标准化**: 统一 WAF、IPS、EDR、NDR、SIEM 等设备的告警格式。
-- **自动化调查**: 使用确定性剧本和 Agent 工具（日志检索、威胁情报查询、MITRE ATT&CK 映射）。
-- **人工审批流程**: 阻断 IP、隔离主机等高危响应动作会暂停并等待人工审批。
-- **Markdown 事件报告**: 生成专业的学术级安全事件分析报告。
-- **评测引擎 (Eval Runner)**: 内置自动化评估系统，持续针对多种网络攻击场景测试 Agent 的分析能力。
-- **即时通讯 (IM) 集成**: 钉钉交互式审批卡片，并提供 Webhook 降级方案。
+- **运行总览**：可收起、可拖拽调宽侧栏，多主题色深浅模式，健康状态卡片、核心指标、高危队列和最近研判时间线。
+- **丰富告警数据**：6 条手工基线告警，加 240 条确定性扩展样例，让列表和看板更接近真实项目观感。
+- **自动化研判**：日志检索、威胁情报、MITRE ATT&CK 映射、知识库检索、审批创建和报告生成。
+- **人工审批**：高风险动作只创建审批或模拟执行记录，不执行真实阻断、隔离、禁用账号或安全策略变更。
+- **系统设置中心**：配置写入本地数据库，密钥类字段只显示是否已配置，不回显明文。
+- **通知机器人**：支持钉钉、飞书、企业微信机器人配置；钉钉额外支持交互式审批卡片回调。
+- **日志中心**：支持本地原始安全日志检索和服务运行日志查看。
+- **评测引擎**：内置 baseline case，用于验证研判严重性、分类和 MITRE 映射质量。
 
 ## 技术栈
 
-- **后端**: Python 3.11+, FastAPI, Pydantic v2, SQLite
-- **前端**: Next.js 14+, TypeScript, Tailwind CSS
-- **流程编排**: 自研的确定性 Agent 工作流
-- **部署方式**: 优先本地开发；可选 Docker Compose 部署。
+- **后端**：Python 3.11+、FastAPI、Pydantic v2、SQLite
+- **前端**：Next.js 16、TypeScript、Tailwind CSS
+- **桌面运行时**：Tauri 2 桌面壳、Next.js 静态导出、Python FastAPI sidecar
+- **数据来源**：本地样例告警、本地 JSONL 安全日志、本地 SQLite
 
-## 快速开始 (本地开发)
+## 快速开始
 
-主要开发路径是在宿主机上直接运行后端和前端。
-
-### 后端
+### 本地开发后端
 
 ```powershell
 cd backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e .[dev]
-uvicorn sentinel_pilot.main:app --reload --port 8000
+python -m sentinel_pilot --host 127.0.0.1 --port 8000
 ```
 
-### 前端
+### 本地开发前端
 
 ```powershell
 cd frontend
 npm install
+$env:NEXT_PUBLIC_API_BASE_URL="http://127.0.0.1:8000"
 npm run dev
 ```
 
-打开浏览器访问：
+浏览器访问：
 
-- **前端工作台**: `http://localhost:3000`
-- **后端 API 与文档**: `http://localhost:8000/docs`
-- **健康检查**: `http://localhost:8000/health`
+- 前端工作台：`http://localhost:3000`
+- 后端接口文档：`http://localhost:8000/docs`
+- 健康检查：`http://localhost:8000/health`
 
-## 验证测试
+## 桌面应用构建
 
-在提交代码前，请运行以下命令进行验证：
+Windows：
+
+```powershell
+.\scripts\build-desktop.ps1
+```
+
+Linux：
+
+```bash
+bash scripts/build-desktop.sh
+```
+
+脚本会先把 FastAPI 后端打包成 Tauri sidecar 二进制文件，再把 Next.js 导出到 `frontend/out`，最后生成原生桌面安装包。Windows 产物位于 `frontend/src-tauri/target/release/bundle/`。
+
+## 验证命令
 
 ```powershell
 cd backend
@@ -67,24 +86,20 @@ cd backend
 cd frontend
 npm run lint
 npm run build
+npm run tauri:build
 ```
 
-## 可选：Docker 部署
+## 配置说明
 
-```bash
-docker compose up -d --build
-```
+需要本地覆盖配置时，将 `.env.example` 复制为 `.env`。真实 API Key、机器人 Webhook 和签名密钥只能放在本地 `.env`。可以从前端修改的运行态配置会写入本地 `system_config` 表，并通过 `/api/settings` 脱敏返回。
 
-Docker 环境使用本地示例数据和一个命名的 SQLite 数据卷。这对于发布前的冒烟测试很有用，但日常开发应以本地启动为主。
-
-## 钉钉配置
-
-交互式卡片需要钉钉应用凭证、机器人 Code、开放群会话 ID、已发布的卡片模板 ID，以及一个可供钉钉访问的 Callback URL。请将这些值仅保存在本地的 `.env` 文件中；`.env.example` 中提供了占位符示例。
+桌面模式下，SQLite 数据库和服务日志写入操作系统用户数据目录，不写入安装目录。Windows 下路径为 `%APPDATA%\SentinelPilot`。
 
 ## 文档参考
 
 - [架构指南](docs/architecture.md)
 - [API 契约](docs/api-contract.md)
+- [桌面打包说明](docs/desktop-packaging.md)
 - [评测报告与测试](docs/eval-report.md)
 - [IM 集成](docs/im-integration.md)
 - [开发进度计划](docs/development-progress-plan.zh-CN.md)

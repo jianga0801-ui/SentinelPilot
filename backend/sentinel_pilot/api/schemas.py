@@ -8,6 +8,7 @@ from sentinel_pilot.core.models import (
     ApprovalAction,
     ApprovalStatus,
     DeviceType,
+    Investigation,
     InvestigationStatus,
     RiskLevel,
     Severity,
@@ -69,6 +70,12 @@ class InvestigationRunResponse(BaseModel):
 
     id: str
     status: InvestigationStatus
+
+
+class InvestigationListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    items: list[Investigation]
 
 
 class TimelineResponse(BaseModel):

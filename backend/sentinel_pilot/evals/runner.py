@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sentinel_pilot.adapters.mock_source import MockAlertSource
 from sentinel_pilot.agent.orchestrator import InvestigationOrchestrator
 from sentinel_pilot.evals.graders import SCORE_KEYS, grade_case
+from sentinel_pilot.runtime_resources import resource_path
 from sentinel_pilot.services.approval_service import ApprovalService
 from sentinel_pilot.services.report_service import ReportService
 from sentinel_pilot.storage.database import create_connection, init_database
@@ -17,8 +18,7 @@ from sentinel_pilot.storage.repositories import (
     TimelineRepository,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_DATASET_PATH = PROJECT_ROOT / "evals" / "datasets" / "initial_cases.json"
+DEFAULT_DATASET_PATH = resource_path("evals", "datasets", "initial_cases.json")
 
 
 class EvalCaseResult(BaseModel):

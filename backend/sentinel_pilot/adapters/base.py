@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Protocol
 
 from sentinel_pilot.core.models import Alert
+from sentinel_pilot.runtime_resources import resource_path
 
 
 class SecurityDeviceAdapter(Protocol):
@@ -22,4 +23,4 @@ class SecurityDeviceAdapter(Protocol):
 
 
 def default_examples_dir() -> Path:
-    return Path(__file__).resolve().parents[3] / "examples"
+    return resource_path("examples")

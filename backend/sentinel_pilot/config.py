@@ -3,7 +3,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "SentinelPilot"
-    database_url: str = "sqlite:///./sentinel_pilot.db"
+    user_data_dir: str = ""
+    database_url: str = ""
+    service_log_path: str = ""
+    cors_allow_origins: str = (
+        "http://localhost:3000,"
+        "http://127.0.0.1:3000,"
+        "http://tauri.localhost,"
+        "https://tauri.localhost,"
+        "tauri://localhost"
+    )
 
     im_provider: str = "dingtalk"
     im_notification_enabled: bool = False
@@ -16,6 +25,9 @@ class Settings(BaseSettings):
     dingtalk_card_template_id: str = ""
     dingtalk_card_callback_url: str = ""
     dingtalk_card_callback_secret: str = ""
+    feishu_webhook_url: str = ""
+    feishu_secret: str = ""
+    wecom_webhook_url: str = ""
     public_app_url: str = "http://localhost:3000"
 
     llm_enabled: bool = False

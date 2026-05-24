@@ -10,6 +10,8 @@ from sentinel_pilot.adapters.mock_source import MockAlertSource
 from sentinel_pilot.config import settings
 from sentinel_pilot.core.errors import SentinelPilotError
 from sentinel_pilot.core.models import Alert, Report
+from sentinel_pilot.desktop_runtime import resolve_runtime_paths
+from sentinel_pilot.runtime_resources import project_root, resource_path
 from sentinel_pilot.storage.database import create_connection, init_database
 from sentinel_pilot.storage.repositories import (
     InvestigationRepository,
@@ -17,10 +19,10 @@ from sentinel_pilot.storage.repositories import (
     TimelineRepository,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_LOGS_PATH = PROJECT_ROOT / "examples" / "logs" / "events.jsonl"
-DEFAULT_THREAT_INTEL_PATH = PROJECT_ROOT / "examples" / "threat_intel" / "indicators.json"
-DEFAULT_KNOWLEDGE_BASE_ROOT = PROJECT_ROOT / "knowledge_base"
+PROJECT_ROOT = project_root()
+DEFAULT_LOGS_PATH = resource_path("examples", "logs", "events.jsonl")
+DEFAULT_THREAT_INTEL_PATH = resource_path("examples", "threat_intel", "indicators.json")
+DEFAULT_KNOWLEDGE_BASE_ROOT = resource_path("knowledge_base")
 
 IndicatorType = Literal["ip", "domain", "hash"]
 Reputation = Literal["unknown", "benign", "suspicious", "malicious"]
@@ -356,7 +358,7 @@ def _resolve_report_dependencies(
     if reports is not None:
         return reports, timeline
 
-    connection = create_connection(settings.database_url)
+    connection = create_connection(resolve_runtime_paths(settings).database_url)
     init_database(connection)
     return ReportRepository(connection), timeline or TimelineRepository(connection)
 

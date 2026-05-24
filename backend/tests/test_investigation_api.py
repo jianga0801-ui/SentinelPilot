@@ -43,6 +43,18 @@ def test_get_investigation_returns_created_record():
     assert body["error_message"] is None
 
 
+def test_list_investigations_returns_created_records():
+    with TestClient(app) as client:
+        created = client.post(
+            "/api/investigations",
+            json={"alert_id": "alert_bruteforce_001"},
+        ).json()
+        response = client.get("/api/investigations", params={"limit": 10})
+
+    assert response.status_code == 200
+    assert any(item["id"] == created["id"] for item in response.json()["items"])
+
+
 def test_timeline_is_available_immediately():
     with TestClient(app) as client:
         created = client.post(

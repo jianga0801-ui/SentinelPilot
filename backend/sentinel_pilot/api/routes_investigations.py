@@ -1,11 +1,12 @@
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 
 from sentinel_pilot.api.dependencies import get_investigation_service
 from sentinel_pilot.api.schemas import (
     InvestigationCreateRequest,
     InvestigationCreateResponse,
+    InvestigationListResponse,
     InvestigationRunResponse,
     TimelineResponse,
 )
@@ -13,6 +14,14 @@ from sentinel_pilot.core.models import Investigation
 from sentinel_pilot.services.investigation_service import InvestigationService
 
 router = APIRouter(prefix="/api/investigations", tags=["investigations"])
+
+
+@router.get("", response_model=InvestigationListResponse)
+def list_investigations(
+    service: Annotated[InvestigationService, Depends(get_investigation_service)],
+    limit: int = Query(default=100, ge=1, le=500),
+) -> InvestigationListResponse:
+    return InvestigationListResponse(items=service.list_recent(limit=limit))
 
 
 @router.post("", response_model=InvestigationCreateResponse)

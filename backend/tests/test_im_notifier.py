@@ -12,6 +12,7 @@ from sentinel_pilot.config import Settings
 from sentinel_pilot.core.models import Approval, Report
 from sentinel_pilot.integrations.im.dingtalk import DingTalkProvider
 from sentinel_pilot.integrations.im.notifier import IMNotifier
+from sentinel_pilot.integrations.im.webhook import FeishuProvider, WeComProvider
 from sentinel_pilot.main import app
 
 
@@ -52,6 +53,37 @@ def test_notifier_status(notifier: IMNotifier):
     assert status["provider"] == "dingtalk"
     assert status["notification_only"] is False
     assert status["callback_enabled"] is True
+
+
+def test_notifier_initializes_feishu_provider():
+    notifier = IMNotifier(
+        Settings(
+            database_url="sqlite:///:memory:",
+            im_provider="feishu",
+            im_notification_enabled=True,
+            feishu_webhook_url="http://feishu-webhook",
+            feishu_secret="feishu-secret",
+        )
+    )
+
+    assert isinstance(notifier.provider, FeishuProvider)
+    status = notifier.get_status()
+    assert status["provider"] == "feishu"
+    assert status["notification_only"] is True
+
+
+def test_notifier_initializes_wecom_provider():
+    notifier = IMNotifier(
+        Settings(
+            database_url="sqlite:///:memory:",
+            im_provider="wecom",
+            im_notification_enabled=True,
+            wecom_webhook_url="http://wecom-webhook",
+        )
+    )
+
+    assert isinstance(notifier.provider, WeComProvider)
+    assert notifier.get_status()["provider"] == "wecom"
 
 
 @patch.object(DingTalkProvider, "send_message")

@@ -120,17 +120,18 @@ export default function EvalsDashboardPage() {
   );
 
   return (
-    <div className="flex-1 p-8 space-y-8 overflow-y-auto bg-[#FCFAF6] font-sans">
+    <div className="sp-page flex-1 space-y-8 overflow-y-auto p-8 font-sans">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#EAE9E4] pb-6">
+      <div className="flex flex-col gap-4 border-b pb-6 md:flex-row md:items-end md:justify-between" style={{ borderColor: 'var(--sp-border)' }}>
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono tracking-widest text-[#6B6D70] uppercase">
+          <div className="sp-muted flex items-center gap-2 text-xs font-semibold">
+            <Workflow className="h-4 w-4 sp-accent" />
             <span>{language === 'zh' ? '威胁研判与效能评估' : 'Threat Analysis & Investigation Performance'}</span>
           </div>
-          <h2 className="text-xl font-semibold text-[#1E2022] tracking-tight mt-1 font-serif">
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight sp-text">
             {t('evals', 'title')}
           </h2>
-          <p className="text-sm text-[#6B6D70] mt-2 font-sans max-w-3xl">
+          <p className="mt-2 max-w-3xl text-sm leading-6 sp-muted">
             {t('evals', 'subtitle')}
           </p>
         </div>
@@ -138,16 +139,16 @@ export default function EvalsDashboardPage() {
         <button
           disabled={running}
           onClick={runEvaluation}
-          className="flex items-center gap-2 px-4 py-2.5 rounded border border-[#EAE9E4] bg-white hover:bg-[#F5F3EB] hover:border-[#D1CDC2] text-[#1E2022] font-mono text-xs font-semibold transition-all disabled:opacity-50 select-none cursor-pointer active:scale-98"
+          className="sp-panel sp-hoverable inline-flex h-10 items-center gap-2 px-4 text-xs font-semibold transition-colors disabled:opacity-50"
         >
           {running ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin text-[#C2593F]" />
-              <span className="text-xs text-[#6B6D70]">{t('evals', 'btnRunning')}</span>
+              <Loader2 className="h-3.5 w-3.5 animate-spin sp-accent" />
+              <span>{t('evals', 'btnRunning')}</span>
             </>
           ) : (
             <>
-              <Play className="w-3.5 h-3.5 text-[#C2593F]" />
+              <Play className="h-3.5 w-3.5 sp-accent" />
               <span>{t('evals', 'btnTrigger')}</span>
             </>
           )}

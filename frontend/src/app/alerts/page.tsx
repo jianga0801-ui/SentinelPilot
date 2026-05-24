@@ -98,28 +98,27 @@ export default function AlertsPage() {
   const lowCount = alerts.filter(a => a.severity === 'low').length;
 
   return (
-    <div className="flex-1 p-8 space-y-8 max-w-7xl mx-auto w-full">
+    <div className="sp-page flex-1 overflow-y-auto p-8 space-y-8 font-sans">
       {/* Header */}
-      <div className="border-b border-[#EAE9E4] pb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+      <div className="flex flex-col gap-4 border-b pb-6 md:flex-row md:items-end md:justify-between" style={{ borderColor: 'var(--sp-border)' }}>
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-[#6B6D70] uppercase">
-            <span>{t('alerts', 'breadcrumbHome')}</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-[#C2593F]">{t('alerts', 'breadcrumbList')}</span>
+          <div className="sp-muted flex items-center gap-2 text-xs font-semibold">
+            <ShieldAlert className="h-4 w-4 sp-accent" />
+            <span>{t('alerts', 'breadcrumbList')}</span>
           </div>
-          <h2 className="text-3xl font-serif font-black text-[#1E2022] tracking-tight mt-1">
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight sp-text">
             {t('alerts', 'title')}
           </h2>
-          <p className="text-sm text-[#6B6D70] max-w-2xl leading-relaxed">
+          <p className="mt-2 max-w-3xl text-sm leading-6 sp-muted">
             {t('alerts', 'subtitle')}
           </p>
         </div>
         <div>
           <button
             onClick={fetchAlerts}
-            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold border border-[#EAE9E4] rounded bg-white text-stone-700 hover:bg-[#F5F3EB] hover:text-[#1E2022] transition-colors duration-150 active:bg-[#EFECE3]"
+            className="sp-panel sp-hoverable inline-flex h-10 items-center gap-2 px-4 text-xs font-semibold transition-colors"
           >
-            <RefreshCw className="w-3 h-3" />
+            <RefreshCw className="h-3.5 w-3.5 sp-accent" />
             <span>{language === 'zh' ? '同步数据' : 'Sync Data'}</span>
           </button>
         </div>
@@ -127,45 +126,45 @@ export default function AlertsPage() {
 
       {/* Grid: Statistics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-[#EAE9E4] p-5 rounded flex items-center justify-between">
+        <div className="sp-panel p-5 flex items-center justify-between">
           <div>
             <span className="text-[10px] font-bold text-[#6B6D70] tracking-wider uppercase">
               {language === 'zh' ? '告警总数' : 'Total Alerts'}
             </span>
-            <h3 className="text-2xl font-serif font-black text-[#1E2022] mt-1">{totalCount}</h3>
+            <h3 className="mt-2 text-3xl font-semibold sp-text">{totalCount}</h3>
           </div>
           <div className="w-8 h-8 rounded bg-[#F5F3EB] flex items-center justify-center text-stone-600">
             <Database className="w-4 h-4" />
           </div>
         </div>
-        <div className="bg-white border border-[#EAE9E4] p-5 rounded flex items-center justify-between">
+        <div className="sp-panel p-5 flex items-center justify-between">
           <div>
             <span className="text-[10px] font-bold text-[#6B6D70] tracking-wider uppercase">
               {language === 'zh' ? '高危 / 紧急' : 'High / Critical'}
             </span>
-            <h3 className="text-2xl font-serif font-black text-[#B83C25] mt-1">{highCriticalCount}</h3>
+            <h3 className="mt-2 text-3xl font-semibold text-[#B83C25]">{highCriticalCount}</h3>
           </div>
           <div className="w-8 h-8 rounded bg-[#FCF1EE] flex items-center justify-center text-[#B83C25]">
             <ShieldAlert className="w-4 h-4" />
           </div>
         </div>
-        <div className="bg-white border border-[#EAE9E4] p-5 rounded flex items-center justify-between">
+        <div className="sp-panel p-5 flex items-center justify-between">
           <div>
             <span className="text-[10px] font-bold text-[#6B6D70] tracking-wider uppercase">
               {language === 'zh' ? '中等风险' : 'Medium Risk'}
             </span>
-            <h3 className="text-2xl font-serif font-black text-[#A37110] mt-1">{mediumCount}</h3>
+            <h3 className="mt-2 text-3xl font-semibold text-[#A37110]">{mediumCount}</h3>
           </div>
           <div className="w-8 h-8 rounded bg-[#FAF5E6] flex items-center justify-center text-[#A37110]">
             <AlertTriangle className="w-4 h-4" />
           </div>
         </div>
-        <div className="bg-white border border-[#EAE9E4] p-5 rounded flex items-center justify-between">
+        <div className="sp-panel p-5 flex items-center justify-between">
           <div>
             <span className="text-[10px] font-bold text-[#6B6D70] tracking-wider uppercase">
               {language === 'zh' ? '低风险 / 安全' : 'Low Risk / Safe'}
             </span>
-            <h3 className="text-2xl font-serif font-black text-[#25633A] mt-1">{lowCount}</h3>
+            <h3 className="mt-2 text-3xl font-semibold text-[#25633A]">{lowCount}</h3>
           </div>
           <div className="w-8 h-8 rounded bg-[#F0F6F1] flex items-center justify-center text-[#25633A]">
             <Info className="w-4 h-4" />
@@ -332,7 +331,7 @@ export default function AlertsPage() {
                       {/* Action */}
                       <td className="py-4 px-5 text-right whitespace-nowrap text-sm">
                         <Link
-                          href={`/alerts/${alert.id}`}
+                          href={`/alerts/detail?id=${encodeURIComponent(alert.id)}`}
                           className="inline-flex items-center gap-1 text-xs font-semibold text-[#C2593F] hover:text-[#A94A32] underline decoration-transparent hover:decoration-[#A94A32] transition-all duration-150"
                         >
                           <span>{t('alerts', 'btnInvestigate')}</span>

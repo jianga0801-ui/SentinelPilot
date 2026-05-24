@@ -51,6 +51,9 @@ class InvestigationService:
             )
         return investigation
 
+    def list_recent(self, limit: int = 100) -> list[Investigation]:
+        return self.investigations.list_recent(limit=limit)
+
     def list_timeline(self, investigation_id: str) -> list[TimelineItem]:
         self.get(investigation_id)
         return self.timeline.list_by_investigation(investigation_id)

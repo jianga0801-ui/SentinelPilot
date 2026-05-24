@@ -44,9 +44,10 @@ def test_mock_alert_source_lists_normalized_alerts():
 
     alerts = source.list_alerts()
 
-    assert len(alerts) == 6
+    assert len(alerts) >= 200
     assert all(isinstance(alert, Alert) for alert in alerts)
     assert alerts[0].id == "alert_bruteforce_001"
+    assert source.get_alert("alert_sample_001").raw["synthetic"] is True
 
 
 def test_mock_alert_source_gets_alert_by_id():

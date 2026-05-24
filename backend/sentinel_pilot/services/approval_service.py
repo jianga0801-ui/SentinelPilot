@@ -30,6 +30,9 @@ class ApprovalService:
             )
         return self.approvals.list_by_investigation(investigation_id)
 
+    def list_recent(self, limit: int = 100) -> list[Approval]:
+        return self.approvals.list_recent(limit=limit)
+
     def decide(
         self,
         approval_id: str,
