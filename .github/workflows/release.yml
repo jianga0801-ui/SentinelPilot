@@ -12,8 +12,8 @@ jobs:
       matrix:
         include:
           - platform: 'macos-latest'
-            args: '--target universal-apple-darwin'
-            sidecar_target: 'x86_64-apple-darwin' # You may adjust for universal if needed
+            args: ''
+            sidecar_target: 'aarch64-apple-darwin'
             os: macos
           - platform: 'ubuntu-22.04'
             args: ''
@@ -83,6 +83,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          projectPath: frontend
           tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
           releaseName: 'SentinelPilot v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
