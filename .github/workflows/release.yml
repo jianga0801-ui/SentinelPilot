@@ -1,0 +1,84 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest'
+            args: '--target universal-apple-darwin'
+            sidecar_target: 'x86_64-apple-darwin' # You may adjust for universal if needed
+            os: macos
+          - platform: 'ubuntu-22.04'
+            args: ''
+            sidecar_target: 'x86_64-unknown-linux-gnu'
+            os: linux
+          - platform: 'windows-latest'
+            args: ''
+            sidecar_target: 'x86_64-pc-windows-msvc'
+            os: windows
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Install dependencies (Ubuntu only)
+        if: matrix.os == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pyinstaller
+
+      - name: Install Frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Build Sidecar (Windows)
+        if: matrix.os == 'windows'
+        run: |
+          ./scripts/build-backend-sidecar.ps1 -TargetTriple ${{ matrix.sidecar_target }}
+
+      - name: Build Sidecar (Unix)
+        if: matrix.os != 'windows'
+        run: |
+          chmod +x ./scripts/build-backend-sidecar.sh
+          ./scripts/build-backend-sidecar.sh ${{ matrix.sidecar_target }}
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
+          releaseName: 'SentinelPilot v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
